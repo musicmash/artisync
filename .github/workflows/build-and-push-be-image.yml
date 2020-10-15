@@ -59,7 +59,7 @@ jobs:
             --cache-from $IMAGE_NAME-api-builder-stage:latest \
             --cache-from $IMAGE_NAME-api:latest \
             --tag $IMAGE_NAME-api:latest \
-            --tag docker.pkg.github.com/$IMAGE_NAME-api/artisync-api:latest \
+            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest \
             .
 
       - name: Login to hubs
@@ -75,7 +75,7 @@ jobs:
         run: |
           docker push $IMAGE_NAME-api-builder-stage:latest
           docker push $IMAGE_NAME-api:latest
-          docker push docker.pkg.github.com/$IMAGE_NAME-api/artisync-api:latest
+          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest
 
       - name: Logout
         run: |
