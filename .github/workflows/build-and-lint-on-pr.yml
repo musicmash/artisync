@@ -1,0 +1,40 @@
+on: [pull_request]
+
+name: Build and lint code on pull request
+
+jobs:
+  build:
+    name: Build and lint code on pull request
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up go 1.15
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.15
+        id: go
+
+      - name: Install artisync binaries
+        run: |
+          go install -v ./cmd/artisync-api/...
+
+# todo: uncomment when internal package will be covered with tests
+#      - name: Test whole code
+#        run: |
+#          go test -v -short ./internal/...
+
+# todo: uncomment when linters will be setup
+#      - name: Install and run lints
+#        run: |
+#          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $GITHUB_WORKSPACE v1.25.0
+#          $GITHUB_WORKSPACE/golangci-lint -v run
+#
+#          go get -u github.com/mgechev/revive
+#          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./cmd/...
+#          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./internal/...
+#          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./pkg/...
