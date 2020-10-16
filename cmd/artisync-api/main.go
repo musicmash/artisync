@@ -2,12 +2,16 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
+
+	"github.com/musicmash/artisync/internal/log"
 )
 
 func main() {
-	fmt.Println("hello, world")
+	log.SetLevel("INFO")
+	log.SetWriters(log.GetConsoleWriter())
+
+	log.Info("hello, world")
 	reader := bufio.NewReader(os.Stdin)
 	_, _ = reader.ReadString('\n')
 }
