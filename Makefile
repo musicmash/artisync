@@ -17,6 +17,12 @@ lint l:
 run:
 	go run ./cmd/artisync-api/...
 
+compose:
+	docker-compose up -d --build
+
+exec-sources:
+	docker exec -it artisync.sources bash
+
 image:
 	docker build \
 		--build-arg RELEASE=${RELEASE} \
