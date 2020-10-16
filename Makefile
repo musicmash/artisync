@@ -10,6 +10,10 @@ build:
 test t:
 	go test -v ./internal/...
 
+lint l:
+	bash ./scripts/revive.sh
+	bash ./scripts/golangci-lint.sh
+
 run:
 	go run ./cmd/artisync-api/...
 

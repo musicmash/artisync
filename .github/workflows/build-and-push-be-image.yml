@@ -31,16 +31,16 @@ jobs:
         run: |
           make t
 
-# todo: uncomment when linters will be setup
-#      - name: Install and run lints
-#        run: |
-#          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $GITHUB_WORKSPACE v1.25.0
-#          $GITHUB_WORKSPACE/golangci-lint -v run
-#
-#          go get -u github.com/mgechev/revive
-#          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./cmd/...
-#          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./internal/...
-#          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./pkg/...
+      - name: Install and run lints
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $GITHUB_WORKSPACE v1.31.0
+
+          $GITHUB_WORKSPACE/golangci-lint -v run
+
+          go get -u github.com/mgechev/revive
+          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./cmd/...
+          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./internal/...
+          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./pkg/...
 
       - name: Pull latest images
         run: |
