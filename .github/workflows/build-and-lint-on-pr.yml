@@ -6,8 +6,6 @@ jobs:
   build:
     name: Build and lint code on pull request
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ${{ github.repository }}
 
     steps:
       - name: Checkout
