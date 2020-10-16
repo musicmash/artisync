@@ -23,10 +23,9 @@ jobs:
         run: |
           go install -v ./cmd/artisync-api/...
 
-# todo: uncomment when internal package will be covered with tests
-#      - name: Test whole code
-#        run: |
-#          go test -v -short ./internal/...
+      - name: Test whole code
+        run: |
+          make t
 
 # todo: uncomment when linters will be setup
 #      - name: Install and run lints

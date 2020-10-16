@@ -7,6 +7,9 @@ all:
 build:
 	go build -ldflags="-s -w" -v -o dist/artisync-api ./cmd/artisync-api/...
 
+test t:
+	go test -v ./internal/...
+
 run:
 	go run ./cmd/artisync-api/...
 
