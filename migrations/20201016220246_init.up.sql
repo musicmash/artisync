@@ -3,6 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 BEGIN;
 
 CREATE TYPE task_state AS ENUM (
+    'created',
     'scheduled',
     'in-progress',
     'done',
@@ -14,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "artist_once_sync_tasks" (
     created_at timestamp    not null  DEFAULT now(),
     updated_at timestamp    not null  DEFAULT now(),
     user_name  varchar(255) not null,
-    state      task_state   not null,
+    state      task_state   not null  DEFAULT 'created',
     details    varchar(255)           DEFAULT null
 );
 
