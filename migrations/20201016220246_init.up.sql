@@ -2,13 +2,20 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 BEGIN;
 
+CREATE TYPE task_state AS ENUM (
+    'scheduled',
+    'in-progress',
+    'done',
+    'error'
+);
+
 CREATE TABLE IF NOT EXISTS "artist_once_sync_tasks" (
-    id         uuid PRIMARY KEY      DEFAULT uuid_generate_v4(),
-    created_at timestamp    not null DEFAULT now(),
-    updated_at timestamp    not null DEFAULT now(),
+    id         uuid PRIMARY KEY       DEFAULT uuid_generate_v4(),
+    created_at timestamp    not null  DEFAULT now(),
+    updated_at timestamp    not null  DEFAULT now(),
     user_name  varchar(255) not null,
-    state      varchar(12)  not null,
-    details    varchar(255)          DEFAULT null
+    state      task_state   not null,
+    details    varchar(255)           DEFAULT null
 );
 
 CREATE INDEX "idx_artist_once_sync_tasks_state" ON "artist_once_sync_tasks" ("state");
