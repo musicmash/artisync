@@ -42,4 +42,24 @@ CREATE TABLE IF NOT EXISTS "artist_sync_refresh_tokens" (
 CREATE INDEX "idx_artist_sync_refresh_tokens_expired_at" ON "artist_sync_refresh_tokens" ("expired_at");
 CREATE UNIQUE INDEX "idx_artist_sync_refresh_tokens_user_name" ON "artist_sync_refresh_tokens" ("user_name");
 
+-- should be equal to schemas from musicmash
+CREATE TABLE IF NOT EXISTS "spotify_artists" (
+    "id"         serial PRIMARY KEY,
+    "created_at" timestamp    NOT NULL DEFAULT now(),
+    "name"       varchar(255) NOT NULL,
+    "poster"     varchar(255) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS "spotify_artist_associations" (
+    "id"         serial PRIMARY KEY,
+    "artist_id"  bigint       NOT NULL,
+    "store_name" varchar(255) NOT NULL,
+    "store_id"   varchar(255) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS "subscriptions" (
+    "id"         serial PRIMARY KEY,
+    "created_at" timestamp    NOT NULL DEFAULT now(),
+    "user_name"  varchar(255) NOT NULL,
+    "artist_id"  bigint       NOT NULL
+);
+
 COMMIT;
