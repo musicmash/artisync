@@ -33,7 +33,7 @@ image:
 ensure-go-migrate-installed:
 	bash ./scripts/install-go-migrate.sh
 
-db-generate: ensure-go-migrate-installed
+db-generate:
 	sqlc generate
 
 # show latest applied migration
