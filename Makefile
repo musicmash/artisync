@@ -15,7 +15,7 @@ lint l:
 	bash ./scripts/golangci-lint.sh
 
 run:
-	go run ./cmd/artisync-api/...
+	go run ./cmd/artisync-api/... --config ./artisync.example.yml
 
 compose:
 	docker-compose up -d --build

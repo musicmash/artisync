@@ -1,0 +1,11 @@
+db:
+  host: artisync.db
+  port: 5432
+  login: artisync
+  password: artisync
+  name: artisync+name
+  auto_migrate: true
+  migrations_dir: /etc/artisync/migrations
+
+log:
+  level: INFO
