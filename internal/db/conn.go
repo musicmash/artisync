@@ -5,6 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/musicmash/artisync/internal/db/models"
 )
@@ -48,4 +51,22 @@ func (conn *Conn) ExecTx(ctx context.Context, fn func(*models.Queries) error) er
 	}
 
 	return tx.Commit()
+}
+
+func (conn *Conn) ApplyMigrations(filePath string) error {
+	driver, err := postgres.WithInstance(conn.db, &postgres.Config{})
+	if err != nil {
+		return fmt.Errorf("can't create migrate postgres instance: %w", err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		filePath,
+		"postgres",
+		driver,
+	)
+	if err != nil {
+		return fmt.Errorf("can't create migrate file driver: %w", err)
+	}
+
+	return m.Up()
 }

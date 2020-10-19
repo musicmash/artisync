@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/db/models"
 	"github.com/musicmash/artisync/internal/log"
@@ -33,6 +34,14 @@ func main() {
 	}
 
 	log.Info("connection to the db established")
+
+	const pathToMigrations = "file:///etc/artisync/migrations"
+
+	log.Info("applying migrations..")
+	err = mgr.ApplyMigrations(pathToMigrations)
+	if err != nil && err != migrate.ErrNoChange {
+		log.Errorf("cant-t apply migrations: %v", err)
+	}
 
 	err = mgr.ExecTx(context.Background(), func(querier *models.Queries) error {
 		art, err := querier.CreateArtist(context.Background(), models.CreateArtistParams{
