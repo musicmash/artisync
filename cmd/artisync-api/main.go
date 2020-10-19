@@ -1,14 +1,15 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"database/sql"
 	"flag"
 	"fmt"
 	"os"
 
+	"github.com/go-chi/chi"
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/musicmash/artisync/internal/api"
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/db/models"
@@ -82,8 +83,10 @@ func main() {
 		exitIfError(fmt.Errorf("got error after tx: %s", err.Error()))
 	}
 
-	reader := bufio.NewReader(os.Stdin)
-	_, _ = reader.ReadString('\n')
+	r := chi.NewRouter()
+	server := api.New(r, conf.HTTP)
+	log.Infof("server is ready to handle requests at: %v", server.Addr)
+	exitIfError(server.ListenAndServe())
 }
 
 func exitIfError(err error) {
