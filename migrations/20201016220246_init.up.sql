@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS "spotify_artists" (
     "id"         serial PRIMARY KEY,
     "created_at" timestamp    NOT NULL DEFAULT now(),
     "name"       varchar(255) NOT NULL,
-    "poster"     varchar(255) NOT NULL
+    "poster"     varchar(255)
 );
 CREATE TABLE IF NOT EXISTS "spotify_artist_associations" (
     "id"         serial PRIMARY KEY,
