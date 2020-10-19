@@ -9,6 +9,8 @@ DROP TABLE IF EXISTS "subscriptions";
 DROP TABLE IF EXISTS "spotify_artist_associations";
 DROP TABLE IF EXISTS "spotify_artists";
 
+DROP TYPE IF EXISTS task_state;
+
 COMMIT;
 
 DROP EXTENSION IF EXISTS "uuid-ossp";
