@@ -14,6 +14,7 @@ import (
 	"github.com/musicmash/artisync/internal/version"
 )
 
+//nolint:funclen
 func main() {
 	log.SetLevel("DEBUG")
 	log.SetWriters(log.GetConsoleWriter())
