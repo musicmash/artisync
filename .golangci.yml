@@ -28,5 +28,7 @@ linters:
     - wsl
     - godox
     - godot
+    - gomnd
     - testpackage
+    - golint # until fix blank import
   fast: false

@@ -1,0 +1,49 @@
+version: "3"
+services:
+  db:
+   image: postgres:12
+   container_name: artisync.db
+   ports:
+     - "5432:5432"
+   environment:
+     - POSTGRES_USER=artisync
+     - POSTGRES_PASSWORD=artisync
+     - POSTGRES_DB=artisync
+
+   # IMPORTANT: this container uses only for tests
+   # DO NOT EXEC QUERIES ON IT!
+  test_db:
+   image: postgres:12
+   container_name: artisync.test_db
+   ports:
+     - "2345:5432"
+   environment:
+     - POSTGRES_DB=artisync_db_ONLY_FOR_AUTOMATED_TESTS
+     - POSTGRES_USER=DO_NOT_EXEC_QUERIES_ON_IT
+     - POSTGRES_PASSWORD=ab3a3ee7-9a03-42d4-9208-82b7f6270db6
+
+  sources:
+    image: golang:latest
+    container_name: artisync.sources
+    depends_on:
+      - db
+      - test_db
+    volumes:
+      - ./:/go/src/artisync
+      - ./migrations:/etc/artisync/migrations
+    working_dir: /go/src/artisync
+    environment:
+      - DB_HOST=artisync.db
+      - DB_PORT=5432
+      - DB_NAME=artisync
+      - DB_USER=artisync
+      - DB_PASSWORD=artisync
+
+      - TEST_DB_HOST=artisync.test_db
+      - TEST_DB_PORT=5432
+      - TEST_DB_NAME=artisync_db_ONLY_FOR_AUTOMATED_TESTS
+      - TEST_DB_USER=DO_NOT_EXEC_QUERIES_ON_IT
+      - TEST_DB_PASSWORD=ab3a3ee7-9a03-42d4-9208-82b7f6270db6
+    stdin_open: true
+    tty: true
+    command: ["/bin/bash"]
