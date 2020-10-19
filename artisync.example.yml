@@ -1,0 +1,11 @@
+db:
+  host: ${DB_HOST}
+  port: ${DB_PORT}
+  name: ${DB_NAME}
+  login: ${DB_USER}
+  password: ${DB_PASSWORD}
+  auto_migrate: true
+  migrations_dir: file:///etc/artisync/migrations
+
+log:
+  level: INFO
