@@ -1,12 +1,20 @@
 package config
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig_Load(t *testing.T) {
+	// assert
+	assert.NoError(t, os.Setenv("DB_HOST", "artisync.db"))
+	assert.NoError(t, os.Setenv("DB_PORT", "5432"))
+	assert.NoError(t, os.Setenv("DB_NAME", "artisync"))
+	assert.NoError(t, os.Setenv("DB_USER", "artisync"))
+	assert.NoError(t, os.Setenv("DB_PASSWORD", "artisync"))
+
 	// action
 	conf, err := LoadFromFile("../../artisync.example.yml")
 
@@ -14,13 +22,13 @@ func TestConfig_Load(t *testing.T) {
 	assert.NoError(t, err)
 
 	// database section
-	assert.Equal(t, conf.DB.Host, "artisync.db")
-	assert.Equal(t, conf.DB.Port, 5432)
-	assert.Equal(t, conf.DB.Name, "artisync+name")
-	assert.Equal(t, conf.DB.Login, "artisync")
-	assert.Equal(t, conf.DB.Password, "artisync")
+	assert.Equal(t, "artisync.db", conf.DB.Host)
+	assert.Equal(t, 5432, conf.DB.Port)
+	assert.Equal(t, "artisync", conf.DB.Name)
+	assert.Equal(t, "artisync", conf.DB.Login)
+	assert.Equal(t, "artisync", conf.DB.Password)
 	assert.True(t, conf.DB.AutoMigrate)
-	assert.Equal(t, conf.DB.MigrationsDir, "/etc/artisync/migrations")
+	assert.Equal(t, "file:///etc/artisync/migrations", conf.DB.MigrationsDir)
 
 	// log section
 	assert.Equal(t, conf.Log.Level, "INFO")

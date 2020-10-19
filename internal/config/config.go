@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -12,6 +13,9 @@ func LoadFromFile(configPath string) (*AppConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// replace ${ENV_NAME} in file with value from the environment
+	b = []byte(os.ExpandEnv(string(b)))
 
 	return LoadFromBytes(b)
 }

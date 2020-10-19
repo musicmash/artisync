@@ -45,10 +45,8 @@ func main() {
 
 	log.Info("connection to the db established")
 
-	const pathToMigrations = "file:///etc/artisync/migrations"
-
 	log.Info("applying migrations..")
-	err = mgr.ApplyMigrations(pathToMigrations)
+	err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
 	if err != nil && err != migrate.ErrNoChange {
 		exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 	}
