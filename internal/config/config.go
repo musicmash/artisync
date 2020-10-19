@@ -31,6 +31,7 @@ func LoadFromBytes(val []byte) (*AppConfig, error) {
 
 func (c *AppConfig) Dump() string {
 	b, _ := yaml.Marshal(c)
+
 	return string(b)
 }
 

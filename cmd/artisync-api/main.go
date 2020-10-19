@@ -16,12 +16,9 @@ import (
 	"github.com/musicmash/artisync/internal/version"
 )
 
-var (
-	configPath = flag.String("config", "", "abs path to conf file")
-)
-
 //nolint:funclen
 func main() {
+	configPath := flag.String("config", "", "abs path to conf file")
 	flag.Parse()
 
 	if *configPath == "" {
@@ -51,6 +48,7 @@ func main() {
 		exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 	}
 
+	log.Info("creating artists and others...")
 	err = mgr.ExecTx(context.Background(), func(querier *models.Queries) error {
 		art, err := querier.CreateArtist(context.Background(), models.CreateArtistParams{
 			Name:   "rammstein",
