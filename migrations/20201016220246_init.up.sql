@@ -44,7 +44,7 @@ CREATE UNIQUE INDEX "idx_artist_sync_refresh_tokens_user_name" ON "artist_sync_r
 
 -- should be equal to schemas from musicmash
 CREATE TABLE IF NOT EXISTS "spotify_artists" (
-    "id"         serial PRIMARY KEY,
+    "id"         bigserial PRIMARY KEY,
     "created_at" timestamp    NOT NULL DEFAULT now(),
     "name"       varchar(255) NOT NULL,
     "poster"     varchar(255)

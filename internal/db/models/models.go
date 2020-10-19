@@ -57,7 +57,7 @@ type ArtistSyncRefreshToken struct {
 }
 
 type SpotifyArtist struct {
-	ID        int32          `json:"id"`
+	ID        int64          `json:"id"`
 	CreatedAt time.Time      `json:"created_at"`
 	Name      string         `json:"name"`
 	Poster    sql.NullString `json:"poster"`
