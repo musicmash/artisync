@@ -24,11 +24,15 @@ func main() {
 		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
 		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"),
 	)
+
+	log.Info("connecting to db...")
 	mgr, err := db.Connect(dsn)
 	if err != nil {
 		log.Error(err.Error())
 		os.Exit(2)
 	}
+
+	log.Info("connection to the db established")
 
 	err = mgr.ExecTx(context.Background(), func(querier *models.Queries) error {
 		art, err := querier.CreateArtist(context.Background(), models.CreateArtistParams{

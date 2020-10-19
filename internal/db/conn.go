@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/lib/pq"
 	"github.com/musicmash/artisync/internal/db/models"
@@ -20,17 +19,15 @@ type Conn struct {
 }
 
 func Connect(dsn string) (*Conn, error) {
-	log.Println("connecting to db...")
 	db, err := sql.Open(driver, dsn)
 	if err != nil {
 		return nil, err
 	}
 
 	if err := db.Ping(); err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
-	log.Println("connection to the db established!")
 	return &Conn{db: db, Queries: models.New(db)}, nil
 }
 
