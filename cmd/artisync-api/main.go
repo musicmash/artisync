@@ -40,10 +40,27 @@ func main() {
 			Poster: sql.NullString{},
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("can't create new artist: %w", err)
 		}
 
-		log.Infof("id: %d, created_at: %v", art.ID, art.CreatedAt.String())
+		_, err = querier.CreateArtistAssociation(context.Background(), models.CreateArtistAssociationParams{
+			ArtistID:  art.ID,
+			StoreName: "spotify",
+			StoreID:   "059c3940-a791-422d-8330-2954918c51e6",
+		})
+		if err != nil {
+			return fmt.Errorf("can't associate artist: %w", err)
+		}
+
+		err = querier.CreateSubscription(context.Background(), models.CreateSubscriptionParams{
+			UserName:  "objque",
+			StoreName: "spotify",
+			StoreID:   "059c3940-a791-422d-8330-2954918c51e6",
+		})
+		if err != nil {
+			return fmt.Errorf("can't subscribe user: %w", err)
+		}
+
 		return nil
 	})
 	if err != nil {
