@@ -10,7 +10,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/go-chi/chi"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/musicmash/artisync/internal/api"
 	"github.com/musicmash/artisync/internal/config"
@@ -86,8 +85,8 @@ func main() {
 		exitIfError(fmt.Errorf("got error after tx: %s", err.Error()))
 	}
 
-	r := chi.NewRouter()
-	server := api.New(r, conf.HTTP)
+	router := api.GetRouter(mgr)
+	server := api.New(router, conf.HTTP)
 
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)

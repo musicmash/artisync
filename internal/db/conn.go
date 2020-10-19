@@ -34,6 +34,10 @@ func Connect(dsn string) (*Conn, error) {
 	return &Conn{db: db, Queries: models.New(db)}, nil
 }
 
+func (conn *Conn) Ping() error {
+	return conn.db.Ping()
+}
+
 func (conn *Conn) Close() error {
 	return conn.db.Close()
 }
