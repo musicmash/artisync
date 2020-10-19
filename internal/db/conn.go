@@ -34,6 +34,10 @@ func Connect(dsn string) (*Conn, error) {
 	return &Conn{db: db, Queries: models.New(db)}, nil
 }
 
+func (conn *Conn) Close() error {
+	return conn.db.Close()
+}
+
 func (conn *Conn) ExecTx(ctx context.Context, fn func(*models.Queries) error) error {
 	tx, err := conn.db.BeginTx(ctx, nil)
 	if err != nil {

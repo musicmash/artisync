@@ -5,7 +5,10 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/go-chi/chi"
 	"github.com/golang-migrate/migrate/v4"
@@ -85,8 +88,34 @@ func main() {
 
 	r := chi.NewRouter()
 	server := api.New(r, conf.HTTP)
+
+	done := make(chan bool, 1)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
+	defer cancel()
+
+	go gracefulShutdown(ctx, server, quit, done)
+
 	log.Infof("server is ready to handle requests at: %v", server.Addr)
-	exitIfError(server.ListenAndServe())
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		exitIfError(fmt.Errorf("could not listen on %v: %v", server.Addr, err))
+	}
+
+	<-done
+	_ = mgr.Close()
+	log.Info("artisync-api stopped")
+}
+
+func gracefulShutdown(ctx context.Context, server *api.Server, quit <-chan os.Signal, done chan<- bool) {
+	<-quit
+	log.Info("server is shutting down...")
+
+	server.SetKeepAlivesEnabled(false)
+	if err := server.Shutdown(ctx); err != nil {
+		log.Errorf("could not gracefully shutdown the server: %v", err)
+	}
+	close(done)
 }
 
 func exitIfError(err error) {
