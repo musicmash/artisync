@@ -24,7 +24,7 @@ RUN go build -v -a \
        -X ${PROJECT}/internal/version.BuildTime=${BUILD_TIME}" \
     -o /usr/local/bin/artisync-api ./cmd/artisync-api/...
 
-FROM alpine:latest
+FROM alpine:latest as artisync-api
 
 RUN addgroup -S artisync-api && adduser -S artisync-api -G artisync-api
 USER artisync-api
