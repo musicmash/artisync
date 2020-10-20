@@ -1,17 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"context"
-	"database/sql"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/musicmash/artisync/internal/api"
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/db"
-	"github.com/musicmash/artisync/internal/db/models"
 	"github.com/musicmash/artisync/internal/log"
 	"github.com/musicmash/artisync/internal/version"
 )
@@ -48,42 +49,36 @@ func main() {
 		exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 	}
 
-	log.Info("creating artists and others...")
-	err = mgr.ExecTx(context.Background(), func(querier *models.Queries) error {
-		art, err := querier.CreateArtist(context.Background(), models.CreateArtistParams{
-			Name:   "rammstein",
-			Poster: sql.NullString{},
-		})
-		if err != nil {
-			return fmt.Errorf("can't create new artist: %w", err)
-		}
+	router := api.GetRouter(mgr)
+	server := api.New(router, conf.HTTP)
 
-		_, err = querier.CreateArtistAssociation(context.Background(), models.CreateArtistAssociationParams{
-			ArtistID:  art.ID,
-			StoreName: "spotify",
-			StoreID:   "059c3940-a791-422d-8330-2954918c51e6",
-		})
-		if err != nil {
-			return fmt.Errorf("can't associate artist: %w", err)
-		}
+	done := make(chan bool, 1)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
+	defer cancel()
 
-		err = querier.CreateSubscription(context.Background(), models.CreateSubscriptionParams{
-			UserName:  "objque",
-			StoreName: "spotify",
-			StoreID:   "059c3940-a791-422d-8330-2954918c51e6",
-		})
-		if err != nil {
-			return fmt.Errorf("can't subscribe user: %w", err)
-		}
+	go gracefulShutdown(ctx, server, quit, done)
 
-		return nil
-	})
-	if err != nil {
-		exitIfError(fmt.Errorf("got error after tx: %s", err.Error()))
+	log.Infof("server is ready to handle requests at: %v", server.Addr)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		exitIfError(fmt.Errorf("could not listen on %v: %v", server.Addr, err))
 	}
 
-	reader := bufio.NewReader(os.Stdin)
-	_, _ = reader.ReadString('\n')
+	<-done
+	_ = mgr.Close()
+	log.Info("artisync-api stopped")
+}
+
+func gracefulShutdown(ctx context.Context, server *api.Server, quit <-chan os.Signal, done chan<- bool) {
+	<-quit
+	log.Info("server is shutting down...")
+
+	server.SetKeepAlivesEnabled(false)
+	if err := server.Shutdown(ctx); err != nil {
+		log.Errorf("could not gracefully shutdown the server: %v", err)
+	}
+	close(done)
 }
 
 func exitIfError(err error) {

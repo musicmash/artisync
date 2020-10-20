@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -20,6 +21,13 @@ func TestConfig_Load(t *testing.T) {
 
 	// assert
 	assert.NoError(t, err)
+
+	// server section
+	assert.Equal(t, "0.0.0.0", conf.HTTP.IP)
+	assert.Equal(t, 80, conf.HTTP.Port)
+	assert.Equal(t, 10*time.Second, conf.HTTP.ReadTimeout)
+	assert.Equal(t, 10*time.Second, conf.HTTP.WriteTimeout)
+	assert.Equal(t, 10*time.Second, conf.HTTP.IdleTimeout)
 
 	// database section
 	assert.Equal(t, "artisync.db", conf.DB.Host)
