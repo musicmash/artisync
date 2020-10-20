@@ -1,0 +1,21 @@
+{
+	"service": "sources",
+	"workspaceFolder": "/go/src/artisync",
+
+	"name": "artisync dev environment based on docker-compose.yml",
+	"extensions": [
+		"streetsidesoftware.code-spell-checker",
+		"golang.go",
+		"shardulm94.trailing-spaces",
+		"adpyke.vscode-sql-formatter",
+		"ms-azuretools.vscode-docker",
+		"eamodio.gitlens"
+	],
+	"dockerComposeFile": [
+		"../docker-compose.yml",
+	],
+	 "postCreateCommand": "apt-get update && apt-get install -y fish",
+	 "settings": {
+	 	"terminal.integrated.shell.linux": "/usr/bin/fish"
+	 }
+}
