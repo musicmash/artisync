@@ -43,10 +43,12 @@ func main() {
 
 	log.Info("connection to the db established")
 
-	log.Info("applying migrations..")
-	err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
-	if err != nil && err != migrate.ErrNoChange {
-		exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
+	if conf.DB.AutoMigrate {
+		log.Info("applying migrations..")
+		err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
+		if err != nil && err != migrate.ErrNoChange {
+			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
+		}
 	}
 
 	router := api.GetRouter(mgr)
