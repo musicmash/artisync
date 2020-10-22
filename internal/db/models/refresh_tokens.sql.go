@@ -11,6 +11,8 @@ import (
 const createRefreshToken = `-- name: CreateRefreshToken :exec
 INSERT INTO "artist_sync_refresh_tokens" (user_name, expired_at, value)
 VALUES ($1, $2, $3)
+ON CONFLICT (user_name)
+DO UPDATE SET value= $3
 `
 
 type CreateRefreshTokenParams struct {

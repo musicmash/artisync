@@ -14,6 +14,7 @@ import (
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
+	"github.com/musicmash/artisync/internal/pipelines/syntask"
 	"github.com/musicmash/artisync/internal/version"
 )
 
@@ -51,7 +52,8 @@ func main() {
 		}
 	}
 
-	router := api.GetRouter(mgr)
+	pipeline:= syntask.New(mgr)
+	router := api.GetRouter(mgr, pipeline)
 	server := api.New(router, conf.HTTP)
 
 	done := make(chan bool, 1)

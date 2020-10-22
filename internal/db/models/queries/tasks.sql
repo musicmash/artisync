@@ -3,9 +3,10 @@ SELECT * FROM "artist_once_sync_tasks"
 WHERE user_name = @user_name AND state NOT IN ('done', 'error')
 LIMIT 1;
 
--- name: CreateSyncTask :exec
+-- name: CreateSyncTask :one
 INSERT INTO "artist_once_sync_tasks" (user_name)
-VALUES (@user_name);
+VALUES (@user_name)
+RETURNING *;
 
 -- name: GetSyncTaskState :one
 SELECT id, state FROM "artist_once_sync_tasks"

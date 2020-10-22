@@ -10,14 +10,24 @@ import (
 	"github.com/google/uuid"
 )
 
-const createSyncTask = `-- name: CreateSyncTask :exec
+const createSyncTask = `-- name: CreateSyncTask :one
 INSERT INTO "artist_once_sync_tasks" (user_name)
 VALUES ($1)
+RETURNING id, created_at, updated_at, user_name, state, details
 `
 
-func (q *Queries) CreateSyncTask(ctx context.Context, userName string) error {
-	_, err := q.db.ExecContext(ctx, createSyncTask, userName)
-	return err
+func (q *Queries) CreateSyncTask(ctx context.Context, userName string) (ArtistOnceSyncTask, error) {
+	row := q.db.QueryRowContext(ctx, createSyncTask, userName)
+	var i ArtistOnceSyncTask
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserName,
+		&i.State,
+		&i.Details,
+	)
+	return i, err
 }
 
 const getNextScheduledTask = `-- name: GetNextScheduledTask :one
