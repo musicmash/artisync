@@ -21,7 +21,7 @@ func New(conn *db.Conn) *Controller {
 func (c *Controller) Post(w http.ResponseWriter, r *http.Request) {
 	err := c.conn.ExecTx(context.Background(), func(querier *models.Queries) error {
 		art, err := querier.CreateArtist(r.Context(), models.CreateArtistParams{
-			Name:   "rammstein",
+			Name:   "artisync-test",
 			Poster: sql.NullString{},
 		})
 		if err != nil {

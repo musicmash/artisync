@@ -55,6 +55,7 @@ jobs:
             -t $IMAGE_NAME-api-builder-stage \
             .
           docker build \
+            --target artisync-api \
             --cache-from $IMAGE_NAME-api-builder-stage:latest \
             --cache-from $IMAGE_NAME-api:latest \
             --tag $IMAGE_NAME-api:latest \
