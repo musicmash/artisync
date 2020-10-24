@@ -27,7 +27,7 @@ func GetRouter(conn *db.Conn, mgr *syntask.Mgr) chi.Router {
 		r.Use(middleware.Logger)
 
 		r.Mount("/callbacks/spotify/artisync", spotify.New(mgr).GetRouter())
-		r.Mount("/tasks", tasks.New(conn).GetRouter())
+		r.Mount("/tasks", tasks.New(mgr).GetRouter())
 	})
 
 	return r

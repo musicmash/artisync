@@ -1,21 +1,19 @@
 package tasks
 
 import (
-	"database/sql"
-	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/musicmash/artisync/internal/api/httputils"
-	"github.com/musicmash/artisync/internal/db"
+	"github.com/musicmash/artisync/internal/services/syntask"
 )
 
 type Controller struct {
-	mgr *db.Conn
+	mgr *syntask.Mgr
 }
 
-func New(mgr *db.Conn) *Controller {
+func New(mgr *syntask.Mgr) *Controller {
 	return &Controller{mgr: mgr}
 }
 
@@ -32,16 +30,11 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	state, err := c.mgr.GetOneTimeSyncTaskState(r.Context(), taskID)
-	if err == nil {
-		_ = httputils.WriteJSON(w, http.StatusOK, state)
+	state, err := c.mgr.GetSyncTaskState(r.Context(), taskID)
+	if err != nil {
+		httputils.WriteGuardError(w, err)
 		return
 	}
 
-	if errors.Is(err, sql.ErrNoRows) {
-		httputils.WriteErrorWithCode(w, http.StatusNotFound, ErrTaskNotFound)
-		return
-	}
-
-	httputils.WriteInternalError(w, err)
+	_ = httputils.WriteJSON(w, http.StatusOK, state)
 }

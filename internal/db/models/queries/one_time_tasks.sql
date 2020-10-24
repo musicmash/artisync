@@ -9,7 +9,7 @@ VALUES (@user_name)
 RETURNING *;
 
 -- name: GetOneTimeSyncTaskState :one
-SELECT id, state FROM "artist_one_time_sync_tasks"
+SELECT id, state, details FROM "artist_one_time_sync_tasks"
 WHERE id = @id
 LIMIT 1;
 
