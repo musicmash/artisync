@@ -51,7 +51,7 @@ func (c *Controller) Post(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		_, _ = fmt.Fprintf(w, "got error after tx: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
-		return //nolint:nlreturn
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
@@ -60,7 +60,7 @@ func (c *Controller) Post(w http.ResponseWriter, r *http.Request) {
 func (c *Controller) Get(w http.ResponseWriter, _ *http.Request) {
 	if err := c.conn.Ping(); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		return //nolint:nlreturn
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

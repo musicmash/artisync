@@ -31,13 +31,11 @@ func WriteErrorWithCode(w http.ResponseWriter, code int, err error) {
 func WriteGuardError(w http.ResponseWriter, err error) {
 	if guard.IsClientError(err) {
 		WriteClientError(w, errors.Unwrap(err))
-
 		return
 	}
 
 	if guard.IsInternalError(err) {
 		WriteInternalError(w, errors.Unwrap(err))
-
 		return
 	}
 

@@ -23,24 +23,24 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 	rawID := chi.URLParam(r, "task_id")
 	if rawID == "" {
 		httputils.WriteErrorWithCode(w, http.StatusNotFound, ErrTaskNotFound)
-		return //nolint:nlreturn
+		return
 	}
 
 	taskID, err := uuid.Parse(rawID)
 	if err != nil {
 		httputils.WriteClientError(w, ErrInvalidUUID)
-		return //nolint:nlreturn
+		return
 	}
 
 	state, err := c.mgr.GetOneTimeSyncTaskState(r.Context(), taskID)
 	if err == nil {
 		_ = httputils.WriteJSON(w, http.StatusOK, state)
-		return //nolint:nlreturn
+		return
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
 		httputils.WriteErrorWithCode(w, http.StatusNotFound, ErrTaskNotFound)
-		return //nolint:nlreturn
+		return
 	}
 
 	httputils.WriteInternalError(w, err)

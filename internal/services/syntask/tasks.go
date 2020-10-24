@@ -82,7 +82,7 @@ func (m *Mgr) getOrCreateSyncTaskForUser(ctx context.Context, scheduleDaily bool
 		}
 
 		result := Task(*task)
-		return &result, nil //nolint:nlreturn
+		return &result, nil
 	}
 
 	// another error here

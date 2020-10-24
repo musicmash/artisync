@@ -28,7 +28,7 @@ func (c *Controller) processCallback(isDaily bool, w http.ResponseWriter, r *htt
 	values := r.URL.Query()
 	if err := validateQuery(r.URL.Query()); err != nil {
 		httputils.WriteClientError(w, err)
-		return //nolint:nlreturn
+		return
 	}
 
 	var (
@@ -46,7 +46,7 @@ func (c *Controller) processCallback(isDaily bool, w http.ResponseWriter, r *htt
 	}
 	if err != nil {
 		httputils.WriteGuardError(w, err)
-		return //nolint:nlreturn
+		return
 	}
 
 	url := fmt.Sprintf("/onboarding/artist-sync?task_id=%v", task.ID.String())

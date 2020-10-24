@@ -38,7 +38,7 @@ func ScheduleSyncTaskStep(ctx context.Context, opts *PipelineOpts, data *Pipelin
 		}
 
 		data.task = &Task{ID: task.ID, State: string(task.State)}
-		return nil //nolint:nlreturn
+		return nil
 	})
 	if err != nil {
 		return guard.NewInternalError(fmt.Errorf("can't close tx: %w", err))

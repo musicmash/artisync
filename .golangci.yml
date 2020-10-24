@@ -31,4 +31,5 @@ linters:
     - gomnd
     - testpackage
     - golint # until fix blank import
+    - nlreturn
   fast: false

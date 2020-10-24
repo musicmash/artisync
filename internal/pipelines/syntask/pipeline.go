@@ -58,7 +58,7 @@ func (t *TaskPipeline) Run(ctx context.Context, opts *PipelineOpts) (*Task, erro
 
 	if data.task == nil {
 		log.Error(ErrInternalEmptyTask.Error())
-		return nil, ErrInternalEmptyTask //nolint:nlreturn
+		return nil, ErrInternalEmptyTask
 	}
 
 	return data.task, nil
