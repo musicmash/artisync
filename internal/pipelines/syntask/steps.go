@@ -8,7 +8,7 @@ import (
 )
 
 func GetRefreshTokenStep(ctx context.Context, opts *PipelineOpts, data *PipelineData) error {
-	token, err := opts.auth.Exchange(ctx, opts.SpotifyAuthCode)
+	token, err := data.auth.Exchange(ctx, opts.SpotifyAuthCode)
 	if err != nil {
 		return fmt.Errorf("can't get access_token: %w", err)
 	}

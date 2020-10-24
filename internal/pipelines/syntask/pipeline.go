@@ -16,7 +16,6 @@ type Task struct {
 }
 
 type PipelineOpts struct {
-	auth              *oauth2.Config
 	UserName          string
 	SpotifyAuthCode   string
 	ScheduleDailySync bool
