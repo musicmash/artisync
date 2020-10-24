@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/musicmash/artisync/internal/db/models"
-	"github.com/musicmash/artisync/internal/guard"
 )
 
 func GetRefreshTokenStep(ctx context.Context, opts *PipelineOpts, data *PipelineData) error {
@@ -44,7 +43,7 @@ func ScheduleSyncTaskStep(ctx context.Context, opts *PipelineOpts, data *Pipelin
 		return nil
 	})
 	if err != nil {
-		return guard.NewInternalError(fmt.Errorf("can't close tx: %w", err))
+		return fmt.Errorf("can't close tx: %w", err)
 	}
 
 	return nil

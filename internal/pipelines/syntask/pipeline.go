@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/musicmash/artisync/internal/db"
-	"github.com/musicmash/artisync/internal/log"
 	"golang.org/x/oauth2"
 )
 
@@ -62,7 +61,6 @@ func (t *TaskPipeline) Run(ctx context.Context, opts *PipelineOpts) (*Task, erro
 	}
 
 	if data.task == nil {
-		log.Error(ErrInternalEmptyTask.Error())
 		return nil, ErrInternalEmptyTask
 	}
 
