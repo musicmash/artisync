@@ -5,15 +5,15 @@ import (
 	"net/http"
 
 	"github.com/musicmash/artisync/internal/api/httputils"
-	"github.com/musicmash/artisync/internal/pipelines/syntask"
+	"github.com/musicmash/artisync/internal/services/syntask"
 )
 
 type Controller struct {
-	pipeline syntask.Pipeline
+	mgr *syntask.Mgr
 }
 
-func New(pipeline syntask.Pipeline) *Controller {
-	return &Controller{pipeline: pipeline}
+func New(mgr *syntask.Mgr) *Controller {
+	return &Controller{mgr: mgr}
 }
 
 func (c *Controller) OneTimeSyncCallback(w http.ResponseWriter, r *http.Request) {
@@ -40,9 +40,9 @@ func (c *Controller) processCallback(isDaily bool, w http.ResponseWriter, r *htt
 	)
 
 	if isDaily {
-		task, err = c.pipeline.GetOrCreateDailyTaskForUser(r.Context(), userName, code)
+		task, err = c.mgr.GetOrCreateDailySyncTaskForUser(r.Context(), userName, code)
 	} else {
-		task, err = c.pipeline.GetOrCreateOneTimeTaskForUser(r.Context(), userName, code)
+		task, err = c.mgr.GetOrCreateOneTimeSyncTaskForUser(r.Context(), userName, code)
 	}
 	if err != nil {
 		httputils.WriteGuardError(w, err)

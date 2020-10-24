@@ -14,7 +14,7 @@ import (
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
-	"github.com/musicmash/artisync/internal/pipelines/syntask"
+	"github.com/musicmash/artisync/internal/services/syntask"
 	"github.com/musicmash/artisync/internal/version"
 )
 
@@ -58,8 +58,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
 	defer cancel()
 
-	pipeline := syntask.New(mgr)
-	router := api.GetRouter(mgr, pipeline)
+	router := api.GetRouter(mgr, syntask.New(mgr))
 	server := api.New(router, conf.HTTP)
 
 	go gracefulShutdown(ctx, server, quit, done)
