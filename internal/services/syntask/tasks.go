@@ -20,13 +20,12 @@ type Task struct {
 }
 
 type Mgr struct {
-	// client *spotify.Client
 	conn     *db.Conn
 	pipeline syntask.Pipeline
 }
 
-func New(conn *db.Conn) *Mgr {
-	return &Mgr{conn: conn, pipeline: syntask.New(conn)}
+func New(conn *db.Conn, pipeline syntask.Pipeline) *Mgr {
+	return &Mgr{conn: conn, pipeline: pipeline}
 }
 
 func (m *Mgr) GetSyncTaskState(ctx context.Context, id uuid.UUID) (*Task, error) {

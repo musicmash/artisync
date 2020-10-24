@@ -9,5 +9,6 @@ require (
 	github.com/lib/pq v1.8.0
 	github.com/rs/zerolog v1.20.0
 	github.com/stretchr/testify v1.5.1
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/yaml.v2 v2.2.7
 )

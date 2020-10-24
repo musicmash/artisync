@@ -15,6 +15,8 @@ func TestConfig_Load(t *testing.T) {
 	assert.NoError(t, os.Setenv("DB_NAME", "artisync"))
 	assert.NoError(t, os.Setenv("DB_USER", "artisync"))
 	assert.NoError(t, os.Setenv("DB_PASSWORD", "artisync"))
+	assert.NoError(t, os.Setenv("SPOTIFY_CLIENT_ID", "2c7a0f0a-29fe-4ec4-926f-1e956297af9e"))
+	assert.NoError(t, os.Setenv("SPOTIFY_CLIENT_SECRET", "75f505b3-9e40-4d55-a693-1f2388d944dd"))
 
 	// action
 	conf, err := LoadFromFile("../../artisync.example.yml")
@@ -40,4 +42,12 @@ func TestConfig_Load(t *testing.T) {
 
 	// log section
 	assert.Equal(t, conf.Log.Level, "INFO")
+
+	// spotify section
+	assert.Equal(t, "https://accounts.spotify.com/authorize", conf.Spotify.AuthURL)
+	assert.Equal(t, "https://accounts.spotify.com/api/token", conf.Spotify.TokenURL)
+	assert.Equal(t, "2c7a0f0a-29fe-4ec4-926f-1e956297af9e", conf.Spotify.ClientID)
+	assert.Equal(t, "75f505b3-9e40-4d55-a693-1f2388d944dd", conf.Spotify.ClientSecret)
+	assert.Equal(t, "https://musicmash.me/v1/callbacks/spotify/artists-sync/connect", conf.Spotify.RedirectURL)
+	assert.Len(t, conf.Spotify.Scopes, 2)
 }

@@ -3,15 +3,18 @@ package syntask
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/musicmash/artisync/internal/db/models"
 	"github.com/musicmash/artisync/internal/guard"
 )
 
-func GetRefreshTokenStep(_ context.Context, _ *PipelineOpts, data *PipelineData) error {
-	data.refreshToken = "fake-token"
+func GetRefreshTokenStep(ctx context.Context, opts *PipelineOpts, data *PipelineData) error {
+	token, err := opts.auth.Exchange(ctx, opts.SpotifyAuthCode)
+	if err != nil {
+		return fmt.Errorf("can't get access_token: %w", err)
+	}
 
+	data.token = token
 	return nil
 }
 
@@ -30,8 +33,8 @@ func ScheduleSyncTaskStep(ctx context.Context, opts *PipelineOpts, data *Pipelin
 
 		params := models.CreateRefreshTokenParams{
 			UserName:  opts.UserName,
-			ExpiredAt: time.Now().Add(time.Hour),
-			Value:     data.refreshToken,
+			ExpiredAt: data.token.Expiry,
+			Value:     data.token.RefreshToken,
 		}
 		if err = db.CreateRefreshToken(ctx, params); err != nil {
 			return fmt.Errorf("can't save refresh token for %v: %w", opts.UserName, err)
