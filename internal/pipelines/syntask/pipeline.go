@@ -2,6 +2,7 @@ package syntask
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/google/uuid"
 	"github.com/musicmash/artisync/internal/db"
@@ -9,9 +10,9 @@ import (
 )
 
 type Task struct {
-	ID      uuid.UUID `json:"id"`
-	State   string    `json:"state"`
-	Details *string   `json:"details"`
+	ID      uuid.UUID       `json:"id"`
+	State   string          `json:"state"`
+	Details json.RawMessage `json:"details"`
 }
 
 type PipelineOpts struct {

@@ -3,6 +3,7 @@ package syntask
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -13,9 +14,9 @@ import (
 )
 
 type Task struct {
-	ID      uuid.UUID `json:"id"`
-	State   string    `json:"state"`
-	Details *string   `json:"details"`
+	ID      uuid.UUID       `json:"id"`
+	State   string          `json:"state"`
+	Details json.RawMessage `json:"details"`
 }
 
 type Mgr struct {
@@ -32,12 +33,7 @@ func (m *Mgr) GetSyncTaskState(ctx context.Context, id uuid.UUID) (*Task, error)
 	res, err := m.conn.GetOneTimeSyncTaskState(ctx, id)
 	if err == nil {
 		// active task is found
-		task := Task{ID: res.ID, State: string(res.State)}
-		// TODO (m.kalinin): add details
-		// if res.Details.Valid {
-		// 	task.Details = &res.Details.String
-		// }
-
+		task := Task{ID: res.ID, State: string(res.State), Details: res.Details}
 		return &task, nil
 	}
 
@@ -61,11 +57,7 @@ func (m *Mgr) getOrCreateSyncTaskForUser(ctx context.Context, scheduleDaily bool
 	// if any sync sync task already spawned, but not finished
 	res, err := m.conn.IsAnySyncTaskProcessingForUser(ctx, userName)
 	if err == nil {
-		task := Task{ID: res.ID, State: string(res.State)}
-		if res.Details.Valid {
-			task.Details = &res.Details.String
-		}
-
+		task := Task{ID: res.ID, State: string(res.State), Details: res.Details}
 		return &task, nil
 	}
 

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "artist_one_time_sync_tasks" (
     updated_at timestamp    not null  DEFAULT now(),
     user_name  varchar(255) not null,
     state      task_state   not null  DEFAULT 'created',
-    details    varchar(255)           DEFAULT null
+    details    jsonb        not null  DEFAULT '{}'
 );
 
 CREATE INDEX "idx_artist_one_time_sync_tasks_user_name_state" ON "artist_one_time_sync_tasks" ("user_name", "state");

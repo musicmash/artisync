@@ -5,7 +5,7 @@ package models
 
 import (
 	"context"
-	"database/sql"
+	"encoding/json"
 
 	"github.com/google/uuid"
 )
@@ -57,20 +57,21 @@ func (q *Queries) GetNextScheduledTask(ctx context.Context) (GetNextScheduledTas
 }
 
 const getOneTimeSyncTaskState = `-- name: GetOneTimeSyncTaskState :one
-SELECT id, state FROM "artist_one_time_sync_tasks"
+SELECT id, state, details FROM "artist_one_time_sync_tasks"
 WHERE id = $1
 LIMIT 1
 `
 
 type GetOneTimeSyncTaskStateRow struct {
-	ID    uuid.UUID `json:"id"`
-	State TaskState `json:"state"`
+	ID      uuid.UUID       `json:"id"`
+	State   TaskState       `json:"state"`
+	Details json.RawMessage `json:"details"`
 }
 
 func (q *Queries) GetOneTimeSyncTaskState(ctx context.Context, id uuid.UUID) (GetOneTimeSyncTaskStateRow, error) {
 	row := q.db.QueryRowContext(ctx, getOneTimeSyncTaskState, id)
 	var i GetOneTimeSyncTaskStateRow
-	err := row.Scan(&i.ID, &i.State)
+	err := row.Scan(&i.ID, &i.State, &i.Details)
 	return i, err
 }
 
@@ -101,9 +102,9 @@ WHERE id = $3
 `
 
 type UpdateOneTimeSyncTaskStateParams struct {
-	State   TaskState      `json:"state"`
-	Details sql.NullString `json:"details"`
-	ID      uuid.UUID      `json:"id"`
+	State   TaskState       `json:"state"`
+	Details json.RawMessage `json:"details"`
+	ID      uuid.UUID       `json:"id"`
 }
 
 func (q *Queries) UpdateOneTimeSyncTaskState(ctx context.Context, arg UpdateOneTimeSyncTaskStateParams) error {
