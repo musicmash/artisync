@@ -39,7 +39,7 @@ type ArtistDailySyncTask struct {
 	UserName  string    `json:"user_name"`
 }
 
-type ArtistOnceSyncTask struct {
+type ArtistOneTimeSyncTask struct {
 	ID        uuid.UUID      `json:"id"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

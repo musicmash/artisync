@@ -27,13 +27,13 @@ func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshToken
 }
 
 const getUserSyncTask = `-- name: GetUserSyncTask :one
-SELECT id, created_at, updated_at, user_name, state, details FROM "artist_once_sync_tasks"
+SELECT id, created_at, updated_at, user_name, state, details FROM "artist_one_time_sync_tasks"
 WHERE user_name = $1
 `
 
-func (q *Queries) GetUserSyncTask(ctx context.Context, userName string) (ArtistOnceSyncTask, error) {
+func (q *Queries) GetUserSyncTask(ctx context.Context, userName string) (ArtistOneTimeSyncTask, error) {
 	row := q.db.QueryRowContext(ctx, getUserSyncTask, userName)
-	var i ArtistOnceSyncTask
+	var i ArtistOneTimeSyncTask
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,

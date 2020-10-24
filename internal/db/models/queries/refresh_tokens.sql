@@ -5,5 +5,5 @@ ON CONFLICT (user_name)
 DO UPDATE SET value= @value;
 
 -- name: GetUserSyncTask :one
-SELECT * FROM "artist_once_sync_tasks"
+SELECT * FROM "artist_one_time_sync_tasks"
 WHERE user_name = @user_name;

@@ -21,7 +21,7 @@ type Task struct {
 }
 
 type Pipeline interface {
-	GetOrCreateSingleTaskForUser(ctx context.Context, userName string, code string) (*Task, error)
+	GetOrCreateOneTimeTaskForUser(ctx context.Context, userName string, code string) (*Task, error)
 	GetOrCreateDailyTaskForUser(ctx context.Context, userName string, code string) (*Task, error)
 }
 
@@ -34,7 +34,7 @@ func New(mgr *db.Conn) Pipeline {
 	return &TaskPipeline{mgr: mgr}
 }
 
-func (t *TaskPipeline) GetOrCreateSingleTaskForUser(ctx context.Context, userName string, code string) (*Task, error) {
+func (t *TaskPipeline) GetOrCreateOneTimeTaskForUser(ctx context.Context, userName string, code string) (*Task, error) {
 	// check if any tasks in-progress for user
 	res, err := t.mgr.IsAnySyncTaskProcessingForUser(ctx, userName)
 	if err == nil {
@@ -51,9 +51,9 @@ func (t *TaskPipeline) GetOrCreateSingleTaskForUser(ctx context.Context, userNam
 	if errors.Is(err, sql.ErrNoRows) {
 		// get user's refresh token
 
-		task := models.ArtistOnceSyncTask{}
+		task := models.ArtistOneTimeSyncTask{}
 		err := t.mgr.ExecTx(ctx, func(db *models.Queries) error {
-			task, err = db.CreateSyncTask(ctx, userName)
+			task, err = db.CreateOneTimeSyncTask(ctx, userName)
 			if err != nil {
 				return guard.NewInternalError(fmt.Errorf("can't create sync task for %v: %w", userName, err))
 			}
@@ -86,7 +86,7 @@ func (t *TaskPipeline) GetOrCreateSingleTaskForUser(ctx context.Context, userNam
 func (t *TaskPipeline) GetOrCreateDailyTaskForUser(ctx context.Context, userName string, code string) (*Task, error) {
 	// check if already tasks in-progress?
 	// check if daily state is active
-	log.Warn("will create only once task, cause daily not implemented")
+	log.Warn("will create only one time sync task, cause daily not implemented")
 
-	return t.GetOrCreateSingleTaskForUser(ctx, userName, code)
+	return t.GetOrCreateOneTimeTaskForUser(ctx, userName, code)
 }

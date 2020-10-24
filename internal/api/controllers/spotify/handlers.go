@@ -42,7 +42,7 @@ func (c *Controller) processCallback(isDaily bool, w http.ResponseWriter, r *htt
 	if isDaily {
 		task, err = c.pipeline.GetOrCreateDailyTaskForUser(r.Context(), userName, code)
 	} else {
-		task, err = c.pipeline.GetOrCreateSingleTaskForUser(r.Context(), userName, code)
+		task, err = c.pipeline.GetOrCreateOneTimeTaskForUser(r.Context(), userName, code)
 	}
 	if err != nil {
 		httputils.WriteGuardError(w, err)

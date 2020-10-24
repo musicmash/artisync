@@ -10,7 +10,7 @@ CREATE TYPE task_state AS ENUM (
     'error'
 );
 
-CREATE TABLE IF NOT EXISTS "artist_once_sync_tasks" (
+CREATE TABLE IF NOT EXISTS "artist_one_time_sync_tasks" (
     id         uuid PRIMARY KEY       DEFAULT uuid_generate_v4(),
     created_at timestamp    not null  DEFAULT now(),
     updated_at timestamp    not null  DEFAULT now(),
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "artist_once_sync_tasks" (
     details    varchar(255)           DEFAULT null
 );
 
-CREATE INDEX "idx_artist_once_sync_tasks_user_name_state" ON "artist_once_sync_tasks" ("user_name", "state");
+CREATE INDEX "idx_artist_one_time_sync_tasks_user_name_state" ON "artist_one_time_sync_tasks" ("user_name", "state");
 
 CREATE TABLE IF NOT EXISTS "artist_daily_sync_tasks" (
     id         uuid PRIMARY KEY      DEFAULT uuid_generate_v4(),
