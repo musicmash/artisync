@@ -3,8 +3,6 @@ package spotify
 import (
 	"errors"
 	"net/url"
-
-	"github.com/musicmash/artisync/internal/log"
 )
 
 const (
@@ -13,18 +11,11 @@ const (
 )
 
 var (
-	errAuthFailed   = errors.New("auth failed")
 	errCodeIsEmpty  = errors.New("query arg 'code' is empty")
 	errUnknownState = errors.New("unknown state")
 )
 
-func validateQuery(values url.Values) error {
-	if e := values.Get("error"); e != "" {
-		log.Errorf("auth failed: %v", e)
-
-		return errAuthFailed
-	}
-
+func validateStateAndCode(values url.Values) error {
 	state := values.Get("state")
 	if state != stateBackgroundSyncAllowed && state != stateBackgroundSyncDenied {
 		return errUnknownState

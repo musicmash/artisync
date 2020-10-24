@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/musicmash/artisync/internal/api/httputils"
+	"github.com/musicmash/artisync/internal/log"
 	"github.com/musicmash/artisync/internal/services/syntask"
 )
 
@@ -18,7 +19,18 @@ func New(mgr *syntask.Mgr) *Controller {
 
 func (c *Controller) ProcessCallback(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
-	if err := validateQuery(r.URL.Query()); err != nil {
+
+	if err := values.Get("error"); err != "" {
+		if err != "access_denied" {
+			log.Errorf("got '%v' error query when try to sync artists", err)
+		}
+
+		url := fmt.Sprintf("/onboarding/artist-sync?error=%v", err)
+		http.Redirect(w, r, url, http.StatusMovedPermanently)
+		return
+	}
+
+	if err := validateStateAndCode(r.URL.Query()); err != nil {
 		httputils.WriteClientError(w, err)
 		return
 	}
