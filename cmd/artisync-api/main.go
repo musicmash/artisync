@@ -52,15 +52,15 @@ func main() {
 		}
 	}
 
-	pipeline:= syntask.New(mgr)
-	router := api.GetRouter(mgr, pipeline)
-	server := api.New(router, conf.HTTP)
-
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
 	defer cancel()
+
+	pipeline := syntask.New(mgr)
+	router := api.GetRouter(mgr, pipeline)
+	server := api.New(router, conf.HTTP)
 
 	go gracefulShutdown(ctx, server, quit, done)
 
