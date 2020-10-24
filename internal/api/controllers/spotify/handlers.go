@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/musicmash/artisync/internal/api/httputils"
 	"github.com/musicmash/artisync/internal/pipelines/syntask"
 )
 
@@ -16,21 +15,10 @@ func New(pipeline syntask.Pipeline) *Controller {
 	return &Controller{pipeline: pipeline}
 }
 
-func (c *Controller) ArtistsSyncCallback(w http.ResponseWriter, r *http.Request) {
-	// check is code provided
-	// check state
-	//
+func (c *Controller) OneTimeSyncCallback(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Header)
+}
 
-	const (
-		userName = "objque"
-		state    = "once-sync"
-	)
-
-	task, err := c.pipeline.GetOrCreateSingleTaskForUser(r.Context(), userName, state)
-	if err != nil {
-		httputils.WriteGuardError(w, err)
-		return
-	}
-
-	fmt.Fprintf(w, task.ID.String())
+func (c *Controller) DailySyncCallback(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Header)
 }
