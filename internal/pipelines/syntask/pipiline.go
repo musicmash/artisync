@@ -80,7 +80,7 @@ func (t *TaskPipeline) GetOrCreateOneTimeTaskForUser(ctx context.Context, userNa
 	}
 
 	// another error here
-	return nil, guard.NewInternalError(fmt.Errorf("can't get cuurent tasks for %v: %w", userName, err))
+	return nil, guard.NewInternalError(fmt.Errorf("can't get current tasks for %v: %w", userName, err))
 }
 
 func (t *TaskPipeline) GetOrCreateDailyTaskForUser(ctx context.Context, userName string, code string) (*Task, error) {
