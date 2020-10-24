@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/musicmash/artisync/internal/api/controllers/healthz"
 	"github.com/musicmash/artisync/internal/api/controllers/spotify"
+	"github.com/musicmash/artisync/internal/api/controllers/tasks"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/pipelines/syntask"
 )
@@ -26,6 +27,7 @@ func GetRouter(conn *db.Conn, pipeline syntask.Pipeline) chi.Router {
 		r.Use(middleware.Logger)
 
 		r.Mount("/callbacks/spotify/artisync", spotify.New(pipeline).GetRouter())
+		r.Mount("/tasks", tasks.New(conn).GetRouter())
 	})
 
 	return r
