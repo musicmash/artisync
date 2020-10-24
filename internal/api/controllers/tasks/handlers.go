@@ -20,7 +20,7 @@ func New(mgr *syntask.Mgr) *Controller {
 func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 	rawID := chi.URLParam(r, "task_id")
 	if rawID == "" {
-		httputils.WriteErrorWithCode(w, http.StatusNotFound, ErrTaskNotFound)
+		httputils.WriteErrorWithCode(w, http.StatusBadRequest, ErrTaskNotFound)
 		return
 	}
 
