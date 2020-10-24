@@ -30,7 +30,7 @@ func (c *Controller) ProcessCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := validateStateAndCode(r.URL.Query()); err != nil {
+	if err := validateStateAndCode(values); err != nil {
 		httputils.WriteClientError(w, err)
 		return
 	}
