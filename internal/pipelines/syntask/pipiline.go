@@ -3,6 +3,7 @@ package syntask
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -25,7 +26,7 @@ type Pipeline interface {
 }
 
 type TaskPipeline struct {
-	//client *spotify.Client
+	// client *spotify.Client
 	mgr *db.Conn
 }
 
@@ -42,11 +43,12 @@ func (t *TaskPipeline) GetOrCreateSingleTaskForUser(ctx context.Context, userNam
 		if res.Details.Valid {
 			task.Details = &res.Details.String
 		}
+
 		return &task, nil
 	}
 
 	// task not found
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		// get user's refresh token
 
 		task := models.ArtistOnceSyncTask{}
@@ -57,10 +59,15 @@ func (t *TaskPipeline) GetOrCreateSingleTaskForUser(ctx context.Context, userNam
 			}
 
 			// todo: replace when got access token
-			params := models.CreateRefreshTokenParams{UserName: userName, ExpiredAt: time.Now().Add(time.Hour), Value: "fake-token"}
+			params := models.CreateRefreshTokenParams{
+				UserName:  userName,
+				ExpiredAt: time.Now().Add(time.Hour),
+				Value:     "fake-token",
+			}
 			if err = db.CreateRefreshToken(ctx, params); err != nil {
 				return guard.NewInternalError(fmt.Errorf("can't save refresh token for %v: %w", userName, err))
 			}
+
 			return nil
 		})
 		if err != nil {
@@ -68,6 +75,7 @@ func (t *TaskPipeline) GetOrCreateSingleTaskForUser(ctx context.Context, userNam
 		}
 
 		result := Task{ID: task.ID, State: string(task.State)}
+
 		return &result, nil
 	}
 
@@ -79,5 +87,6 @@ func (t *TaskPipeline) GetOrCreateDailyTaskForUser(ctx context.Context, userName
 	// check if already tasks in-progress?
 	// check if daily state is active
 	log.Warn("will create only once task, cause daily not implemented")
-	return t.GetOrCreateDailyTaskForUser(ctx, userName, code)
+
+	return t.GetOrCreateSingleTaskForUser(ctx, userName, code)
 }
