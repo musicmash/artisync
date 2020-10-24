@@ -22,7 +22,7 @@ func New(mgr *db.Conn) *Controller {
 func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 	rawID := chi.URLParam(r, "task_id")
 	if rawID == "" {
-		w.WriteHeader(http.StatusNotFound)
+		httputils.WriteErrorWithCode(w, http.StatusNotFound, ErrTaskNotFound)
 		return //nolint:nlreturn
 	}
 
@@ -39,7 +39,7 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
-		w.WriteHeader(http.StatusNotFound)
+		httputils.WriteErrorWithCode(w, http.StatusNotFound, ErrTaskNotFound)
 		return //nolint:nlreturn
 	}
 
