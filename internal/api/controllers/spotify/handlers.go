@@ -16,15 +16,7 @@ func New(mgr *syntask.Mgr) *Controller {
 	return &Controller{mgr: mgr}
 }
 
-func (c *Controller) OneTimeSyncCallback(w http.ResponseWriter, r *http.Request) {
-	c.processCallback(false, w, r)
-}
-
-func (c *Controller) DailySyncCallback(w http.ResponseWriter, r *http.Request) {
-	c.processCallback(true, w, r)
-}
-
-func (c *Controller) processCallback(isDaily bool, w http.ResponseWriter, r *http.Request) {
+func (c *Controller) ProcessCallback(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	if err := validateQuery(r.URL.Query()); err != nil {
 		httputils.WriteClientError(w, err)
@@ -39,6 +31,7 @@ func (c *Controller) processCallback(isDaily bool, w http.ResponseWriter, r *htt
 		err  error
 	)
 
+	isDaily := values.Get("state") == stateBackgroundSyncAllowed
 	if isDaily {
 		task, err = c.mgr.GetOrCreateDailySyncTaskForUser(r.Context(), userName, code)
 	} else {

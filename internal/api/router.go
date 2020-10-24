@@ -26,7 +26,7 @@ func GetRouter(conn *db.Conn, mgr *syntask.Mgr) chi.Router {
 		// to avoid logging of healthz requests
 		r.Use(middleware.Logger)
 
-		r.Mount("/callbacks/spotify/artisync", spotify.New(mgr).GetRouter())
+		r.Mount("/sync/connect", spotify.New(mgr).GetRouter())
 		r.Mount("/tasks", tasks.New(mgr).GetRouter())
 	})
 
