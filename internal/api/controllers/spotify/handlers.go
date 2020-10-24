@@ -49,7 +49,6 @@ func (c *Controller) processCallback(isDaily bool, w http.ResponseWriter, r *htt
 		return //nolint:nlreturn
 	}
 
-	w.WriteHeader(http.StatusCreated)
 	url := fmt.Sprintf("/onboarding/artist-sync?task_id=%v", task.ID.String())
 	http.Redirect(w, r, url, http.StatusMovedPermanently)
 }
