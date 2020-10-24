@@ -28,6 +28,16 @@ func ScheduleSyncTaskStep(ctx context.Context, opts *PipelineOpts, data *Pipelin
 			if err := db.CreateDailySyncTask(ctx, opts.UserName); err != nil {
 				return fmt.Errorf("can't create daily sync task for %v: %w", opts.UserName, err)
 			}
+		} else {
+			// by default token.Expiry shows us time
+			// when access-token will expire.
+			// refresh-token keep alive until user manually
+			// disconnect our app in the settings.
+			//
+			// so, if user wanna periodically sync his artists
+			// we should override/prolong token.Expiry time
+			// e.g for 3 months
+			data.token.Expiry = data.token.Expiry.AddDate(0, 3, 0)
 		}
 
 		params := models.CreateRefreshTokenParams{
