@@ -11,7 +11,7 @@ import (
 )
 
 const createOneTimeSyncTask = `-- name: CreateOneTimeSyncTask :one
-INSERT INTO "artist_one_time_sync_tasks" (user_name)
+INSERT INTO artist_one_time_sync_tasks (user_name)
 VALUES ($1)
 RETURNING id, created_at, updated_at, user_name, state, details
 `
@@ -57,7 +57,7 @@ func (q *Queries) GetNextScheduledTask(ctx context.Context) (GetNextScheduledTas
 }
 
 const getOneTimeSyncTaskState = `-- name: GetOneTimeSyncTaskState :one
-SELECT id, state, details FROM "artist_one_time_sync_tasks"
+SELECT id, state, details FROM artist_one_time_sync_tasks
 WHERE id = $1
 LIMIT 1
 `
@@ -76,7 +76,7 @@ func (q *Queries) GetOneTimeSyncTaskState(ctx context.Context, id uuid.UUID) (Ge
 }
 
 const isAnySyncTaskProcessingForUser = `-- name: IsAnySyncTaskProcessingForUser :one
-SELECT id, created_at, updated_at, user_name, state, details FROM "artist_one_time_sync_tasks"
+SELECT id, created_at, updated_at, user_name, state, details FROM artist_one_time_sync_tasks
 WHERE user_name = $1 AND state NOT IN ('done', 'error')
 LIMIT 1
 `

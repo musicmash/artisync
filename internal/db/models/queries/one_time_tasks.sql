@@ -1,15 +1,15 @@
 -- name: IsAnySyncTaskProcessingForUser :one
-SELECT * FROM "artist_one_time_sync_tasks"
+SELECT * FROM artist_one_time_sync_tasks
 WHERE user_name = @user_name AND state NOT IN ('done', 'error')
 LIMIT 1;
 
 -- name: CreateOneTimeSyncTask :one
-INSERT INTO "artist_one_time_sync_tasks" (user_name)
+INSERT INTO artist_one_time_sync_tasks (user_name)
 VALUES (@user_name)
 RETURNING *;
 
 -- name: GetOneTimeSyncTaskState :one
-SELECT id, state, details FROM "artist_one_time_sync_tasks"
+SELECT id, state, details FROM artist_one_time_sync_tasks
 WHERE id = @id
 LIMIT 1;
 

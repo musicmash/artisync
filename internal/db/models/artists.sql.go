@@ -9,7 +9,7 @@ import (
 )
 
 const createArtist = `-- name: CreateArtist :one
-INSERT INTO "spotify_artists" (name, poster)
+INSERT INTO spotify_artists (name, poster)
 VALUES ($1, $2)
 ON CONFLICT DO NOTHING
 RETURNING id, created_at, name, poster

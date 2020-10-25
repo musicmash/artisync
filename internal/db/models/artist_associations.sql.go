@@ -8,7 +8,7 @@ import (
 )
 
 const createArtistAssociation = `-- name: CreateArtistAssociation :one
-INSERT INTO "spotify_artist_associations" (artist_id, store_name, store_id)
+INSERT INTO spotify_artist_associations (artist_id, store_name, store_id)
 VALUES ($1, $2, $3)
 ON CONFLICT DO NOTHING
 RETURNING id, artist_id, store_name, store_id
@@ -33,7 +33,7 @@ func (q *Queries) CreateArtistAssociation(ctx context.Context, arg CreateArtistA
 }
 
 const getArtistAssociation = `-- name: GetArtistAssociation :one
-SELECT id, artist_id, store_name, store_id FROM "spotify_artist_associations"
+SELECT id, artist_id, store_name, store_id FROM spotify_artist_associations
 WHERE store_name = $1 and store_id = $2
 LIMIT 1
 `

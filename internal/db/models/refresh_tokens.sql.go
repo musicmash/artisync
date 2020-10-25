@@ -9,7 +9,7 @@ import (
 )
 
 const createRefreshToken = `-- name: CreateRefreshToken :exec
-INSERT INTO "artist_sync_refresh_tokens" (user_name, expired_at, value)
+INSERT INTO artist_sync_refresh_tokens (user_name, expired_at, value)
 VALUES ($1, $2, $3)
 ON CONFLICT (user_name)
 DO UPDATE SET value= $3
@@ -27,7 +27,7 @@ func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshToken
 }
 
 const getUserSyncTask = `-- name: GetUserSyncTask :one
-SELECT id, created_at, updated_at, user_name, state, details FROM "artist_one_time_sync_tasks"
+SELECT id, created_at, updated_at, user_name, state, details FROM artist_one_time_sync_tasks
 WHERE user_name = $1
 `
 
