@@ -2,7 +2,7 @@
 INSERT INTO "artist_sync_refresh_tokens" (user_name, expired_at, value)
 VALUES (@user_name, @expired_at, @value)
 ON CONFLICT (user_name)
-DO UPDATE SET value= @value;
+DO UPDATE SET value = @value;
 
 -- name: GetUserSyncTask :one
 SELECT * FROM "artist_one_time_sync_tasks"
