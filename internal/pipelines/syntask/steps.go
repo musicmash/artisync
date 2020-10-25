@@ -28,7 +28,7 @@ func ScheduleSyncTaskStep(ctx context.Context, opts *PipelineOpts, data *Pipelin
 			if err := db.CreateDailySyncTask(ctx, opts.UserName); err != nil {
 				return fmt.Errorf("can't create daily sync task for %v: %w", opts.UserName, err)
 			}
-		} else {
+
 			// by default token.Expiry shows us time
 			// when access-token will expire.
 			// refresh-token keep alive until user manually
