@@ -46,6 +46,7 @@ jobs:
         run: |
           docker pull $IMAGE_NAME-api-builder-stage:latest || true
           docker pull $IMAGE_NAME-api:latest || true
+          docker pull $IMAGE_NAME-daily:latest || true
 
       - name: Build the Docker image
         run: |
@@ -54,12 +55,19 @@ jobs:
             --cache-from $IMAGE_NAME-api-builder-stage:latest \
             -t $IMAGE_NAME-api-builder-stage \
             .
+           docker build \
+             --target artisync-api \
+             --cache-from $IMAGE_NAME-api-builder-stage:latest \
+             --cache-from $IMAGE_NAME-api:latest \
+             --tag $IMAGE_NAME-api:latest \
+             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest \
+             .
           docker build \
-            --target artisync-api \
-            --cache-from $IMAGE_NAME-api-builder-stage:latest \
-            --cache-from $IMAGE_NAME-api:latest \
-            --tag $IMAGE_NAME-api:latest \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest \
+            --target artisync-daily \
+            --cache-from $IMAGE_NAME-daily-builder-stage:latest \
+            --cache-from $IMAGE_NAME-daily:latest \
+            --tag $IMAGE_NAME-daily:latest \
+            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest \
             .
 
       - name: Login to hubs
@@ -74,8 +82,12 @@ jobs:
       - name: Push image to hubs
         run: |
           docker push $IMAGE_NAME-api-builder-stage:latest
+
           docker push $IMAGE_NAME-api:latest
           docker push docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest
+
+          docker push $IMAGE_NAME-daily:latest
+          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest
 
       - name: Logout
         run: |

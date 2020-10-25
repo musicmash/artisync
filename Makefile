@@ -6,6 +6,7 @@ all:
 
 build:
 	go build -ldflags="-s -w" -v -o dist/artisync-api ./cmd/artisync-api/...
+	go build -ldflags="-s -w" -v -o dist/artisync-daily ./cmd/artisync-daily/...
 
 test t:
 	go test -v ./internal/...
@@ -14,8 +15,11 @@ lint l:
 	bash ./scripts/revive.sh
 	bash ./scripts/golangci-lint.sh
 
-run:
+run-api:
 	go run -v ./cmd/artisync-api/... --config ./artisync.example.yml
+
+run-daily:
+	go run -v ./cmd/artisync-daily/... --config ./artisync.example.yml
 
 compose:
 	docker-compose up -d --build
@@ -25,6 +29,7 @@ exec-sources:
 
 image:
 	docker build \
+        --target artisync-api \
 		--build-arg RELEASE=${RELEASE} \
 		--build-arg COMMIT=${COMMIT} \
 		--build-arg BUILD_TIME=${BUILD_TIME} \

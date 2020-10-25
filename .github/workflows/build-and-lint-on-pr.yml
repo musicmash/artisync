@@ -20,6 +20,7 @@ jobs:
       - name: Install artisync binaries
         run: |
           go install -v ./cmd/artisync-api/...
+          go install -v ./cmd/artisync-daily/...
 
       - name: Test whole code
         run: |
