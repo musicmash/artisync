@@ -4,10 +4,13 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/musicmash/artisync/internal/api/controllers/healthz"
+	"github.com/musicmash/artisync/internal/api/controllers/spotify"
+	"github.com/musicmash/artisync/internal/api/controllers/tasks"
 	"github.com/musicmash/artisync/internal/db"
+	"github.com/musicmash/artisync/internal/services/syntask"
 )
 
-func GetRouter(conn *db.Conn) chi.Router {
+func GetRouter(conn *db.Conn, mgr *syntask.Mgr) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -22,6 +25,9 @@ func GetRouter(conn *db.Conn) chi.Router {
 		// user logger inside /v1 route
 		// to avoid logging of healthz requests
 		r.Use(middleware.Logger)
+
+		r.Mount("/sync/connect", spotify.New(mgr).GetRouter())
+		r.Mount("/tasks", tasks.New(mgr).GetRouter())
 	})
 
 	return r

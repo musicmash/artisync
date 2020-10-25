@@ -14,6 +14,8 @@ import (
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
+	pipeline "github.com/musicmash/artisync/internal/pipelines/syntask"
+	task "github.com/musicmash/artisync/internal/services/syntask"
 	"github.com/musicmash/artisync/internal/version"
 )
 
@@ -51,14 +53,16 @@ func main() {
 		}
 	}
 
-	router := api.GetRouter(mgr)
-	server := api.New(router, conf.HTTP)
-
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
 	defer cancel()
+
+	syncPipeline := pipeline.New(conf.Spotify.GetOAuthConfig(), mgr)
+	syncTask := task.New(mgr, syncPipeline)
+	router := api.GetRouter(mgr, syncTask)
+	server := api.New(router, conf.HTTP)
 
 	go gracefulShutdown(ctx, server, quit, done)
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/musicmash/artisync/internal/guard"
 	"github.com/musicmash/artisync/internal/log"
 )
 
@@ -25,4 +26,18 @@ func WriteErrorWithCode(w http.ResponseWriter, code int, err error) {
 	w.WriteHeader(code)
 	b, _ := json.Marshal(&ErrorResponse{Error: err.Error()})
 	_, _ = w.Write(b)
+}
+
+func WriteGuardError(w http.ResponseWriter, err error) {
+	if guard.IsClientError(err) {
+		WriteClientError(w, errors.Unwrap(err))
+		return
+	}
+
+	if guard.IsInternalError(err) {
+		WriteInternalError(w, errors.Unwrap(err))
+		return
+	}
+
+	WriteInternalError(w, err)
 }

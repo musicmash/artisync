@@ -1,11 +1,16 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"golang.org/x/oauth2"
+)
 
 type AppConfig struct {
-	Log  LogConfig  `yaml:"log"`
-	DB   DBConfig   `yaml:"db"`
-	HTTP HTTPConfig `yaml:"http"`
+	Log     LogConfig  `yaml:"log"`
+	DB      DBConfig   `yaml:"db"`
+	HTTP    HTTPConfig `yaml:"http"`
+	Spotify Spotify    `yaml:"spotify"`
 }
 
 type LogConfig struct {
@@ -29,4 +34,28 @@ type DBConfig struct {
 	Log           bool   `yaml:"log"`
 	AutoMigrate   bool   `yaml:"auto_migrate"`
 	MigrationsDir string `yaml:"migrations_dir"`
+}
+
+type Spotify struct {
+	AuthURL      string   `yaml:"auth_url"`
+	TokenURL     string   `yaml:"token_url"`
+	ClientID     string   `yaml:"client_id"`
+	ClientSecret string   `yaml:"client_secret"`
+	RedirectURL  string   `yaml:"redirect_url"`
+	Scopes       []string `yaml:"scopes"`
+}
+
+func (s *Spotify) GetOAuthConfig() *oauth2.Config {
+	conf := oauth2.Config{
+		ClientID:     s.ClientID,
+		ClientSecret: s.ClientSecret,
+		RedirectURL:  s.RedirectURL,
+		Scopes:       s.Scopes,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  s.AuthURL,
+			TokenURL: s.TokenURL,
+		},
+	}
+
+	return &conf
 }

@@ -10,6 +10,8 @@ import (
 const createDailySyncTask = `-- name: CreateDailySyncTask :exec
 INSERT INTO artist_daily_sync_tasks (user_name)
 VALUES ($1)
+ON CONFLICT (user_name)
+DO UPDATE SET updated_at = now()
 `
 
 func (q *Queries) CreateDailySyncTask(ctx context.Context, userName string) error {

@@ -4,6 +4,7 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -39,13 +40,13 @@ type ArtistDailySyncTask struct {
 	UserName  string    `json:"user_name"`
 }
 
-type ArtistOnceSyncTask struct {
-	ID        uuid.UUID      `json:"id"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	UserName  string         `json:"user_name"`
-	State     TaskState      `json:"state"`
-	Details   sql.NullString `json:"details"`
+type ArtistOneTimeSyncTask struct {
+	ID        uuid.UUID       `json:"id"`
+	CreatedAt time.Time       `json:"created_at"`
+	UpdatedAt time.Time       `json:"updated_at"`
+	UserName  string          `json:"user_name"`
+	State     TaskState       `json:"state"`
+	Details   json.RawMessage `json:"details"`
 }
 
 type ArtistSyncRefreshToken struct {
