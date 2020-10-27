@@ -1,6 +1,8 @@
 package scheduletask
 
 import (
+	"context"
+
 	"github.com/musicmash/artisync/internal/log"
 )
 
@@ -10,7 +12,7 @@ func New() *Task {
 	return &Task{}
 }
 
-func (t *Task) Schedule() error {
+func (t *Task) Schedule(ctx context.Context) error {
 	// get lock on the db
 	// get users that weren't updated and whose token is still alive
 	// schedule tasks for them

@@ -7,7 +7,7 @@ import (
 	"github.com/musicmash/artisync/internal/log"
 )
 
-type Task func() error
+type Task func(ctx context.Context) error
 
 func Schedule(ctx context.Context, duration time.Duration, task Task) <-chan struct{} {
 	log.Info("cron-job scheduled..")
@@ -19,7 +19,7 @@ func Schedule(ctx context.Context, duration time.Duration, task Task) <-chan str
 		for {
 			select {
 			case <-ticker.C:
-				if err := task(); err != nil {
+				if err := task(ctx); err != nil {
 					log.Error(err.Error())
 				}
 			case <-ctx.Done():
