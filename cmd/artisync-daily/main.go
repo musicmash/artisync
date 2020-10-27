@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/cron"
 	"github.com/musicmash/artisync/internal/log"
 	"github.com/musicmash/artisync/internal/services/scheduletask"
@@ -14,7 +17,20 @@ import (
 )
 
 func main() {
-	log.SetLevel("INFO")
+	configPath := flag.String("config", "", "abs path to conf file")
+	flag.Parse()
+
+	if *configPath == "" {
+		_, _ = fmt.Fprintln(os.Stdout, "provide abs path to config via --config argument")
+		return
+	}
+
+	conf, err := config.LoadFromFile(*configPath)
+	if err != nil {
+		exitIfError(err)
+	}
+
+	log.SetLevel(conf.Log.Level)
 	log.SetWriters(log.GetConsoleWriter())
 
 	log.Debug(version.FullInfo)
@@ -33,4 +49,13 @@ func main() {
 	<-done
 
 	log.Info("daily-sync finished")
+}
+
+func exitIfError(err error) {
+	if err == nil {
+		return
+	}
+
+	log.Error(err.Error())
+	os.Exit(2)
 }
