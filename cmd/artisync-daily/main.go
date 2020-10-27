@@ -58,7 +58,7 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	done := cron.Schedule(ctx, 5*time.Second, task.Schedule)
+	done := cron.Schedule(ctx, time.Hour, task.Schedule)
 	<-interrupt
 	log.Info("got interrupt signal, shutdown..")
 	cancel()
