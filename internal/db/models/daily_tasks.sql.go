@@ -5,6 +5,7 @@ package models
 
 import (
 	"context"
+	"time"
 )
 
 const createDailySyncTask = `-- name: CreateDailySyncTask :exec
@@ -35,4 +36,53 @@ func (q *Queries) GetUserDailySyncTask(ctx context.Context, userName string) (Ar
 		&i.UserName,
 	)
 	return i, err
+}
+
+const resetDailyTasks = `-- name: ResetDailyTasks :execrows
+UPDATE artist_daily_sync_tasks
+SET updated_at=now()
+WHERE
+    updated_at < $1 AND
+    user_name in (
+        SELECT user_name FROM artist_sync_refresh_tokens
+        WHERE expired_at > $1
+    )
+`
+
+func (q *Queries) ResetDailyTasks(ctx context.Context, today time.Time) (int64, error) {
+	result, err := q.db.ExecContext(ctx, resetDailyTasks, today)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const scheduleDailyTasks = `-- name: ScheduleDailyTasks :execrows
+INSERT INTO artist_one_time_sync_tasks (user_name, state)
+SELECT
+    daily.user_name, 'created'
+FROM
+    artist_daily_sync_tasks AS daily
+LEFT JOIN artist_one_time_sync_tasks AS one
+    ON daily.user_name = one.user_name
+AND one.created_at >= $1
+LEFT JOIN artist_sync_refresh_tokens AS token
+    ON daily.user_name = token.user_name AND token.expired_at >= now()
+WHERE
+    daily.updated_at < $2
+    AND one.created_at IS NULL
+    AND token.value != ''
+`
+
+type ScheduleDailyTasksParams struct {
+	Yesterday time.Time `json:"yesterday"`
+	Today     time.Time `json:"today"`
+}
+
+func (q *Queries) ScheduleDailyTasks(ctx context.Context, arg ScheduleDailyTasksParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, scheduleDailyTasks, arg.Yesterday, arg.Today)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }

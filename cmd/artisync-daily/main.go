@@ -52,7 +52,7 @@ func main() {
 		}
 	}
 
-	task := scheduletask.New()
+	task := scheduletask.New(mgr)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
