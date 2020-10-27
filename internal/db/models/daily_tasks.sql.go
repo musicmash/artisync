@@ -45,7 +45,7 @@ WHERE
     updated_at < $1 AND
     user_name in (
         SELECT user_name FROM artist_sync_refresh_tokens
-        WHERE expired_at > $1
+        WHERE expired_at > now()
     )
 `
 
