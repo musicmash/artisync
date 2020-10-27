@@ -9,23 +9,30 @@ import (
 
 type Task func() error
 
-func Schedule(ctx context.Context, duration time.Duration, task Task) {
+func Schedule(ctx context.Context, duration time.Duration, task Task) <-chan struct{} {
 	log.Info("cron-job scheduled..")
 
 	ticker := time.NewTicker(duration)
-	defer func() {
-		log.Info("cron-job cancelled")
-		ticker.Stop()
+
+	done := make(chan struct{}, 1)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				log.Info("fetching")
+				time.Sleep(8 * time.Second)
+				if err := task(); err != nil {
+					log.Error(err.Error())
+				}
+			case <-ctx.Done():
+				log.Info("ctx done")
+				log.Info("cron-job finished")
+				ticker.Stop()
+				done <- struct{}{}
+				return
+			}
+		}
 	}()
 
-	for {
-		select {
-		case <-ticker.C:
-			if err := task(); err != nil {
-				log.Error(err.Error())
-			}
-		case <-ctx.Done():
-			return
-		}
-	}
+	return done
 }

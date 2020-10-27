@@ -1,9 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/musicmash/artisync/internal/cron"
@@ -22,11 +23,16 @@ func main() {
 
 	log.Debug(version.FullInfo)
 
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	go cron.Schedule(ctx, 5*time.Second, fetch)
 
-	log.Info("artisync-daily is running...")
-	reader := bufio.NewReader(os.Stdin)
-	_, _ = reader.ReadString('\n')
+	done := cron.Schedule(ctx, 5*time.Second, fetch)
+	<-interrupt
+	log.Info("got interrupt signal, shutdown..")
+	cancel()
+
+	<-done
+
+	log.Info("daily-sync finished")
 }
