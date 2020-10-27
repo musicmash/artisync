@@ -19,8 +19,6 @@ func Schedule(ctx context.Context, duration time.Duration, task Task) <-chan str
 		for {
 			select {
 			case <-ticker.C:
-				log.Info("fetching")
-				time.Sleep(8 * time.Second)
 				if err := task(); err != nil {
 					log.Error(err.Error())
 				}
