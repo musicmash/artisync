@@ -20,7 +20,10 @@ func New(conn *db.Conn) *Task {
 
 func (t *Task) Schedule(ctx context.Context) error {
 	return t.conn.ExecTx(ctx, func(db *models.Queries) error {
-		// todo: get lock on the db
+		// get lock to avoid race condition between instances
+		if err := db.GetDailyLock(ctx); err != nil {
+			return fmt.Errorf("can't get lock: %w", err)
+		}
 
 		// schedule tasks for users that weren't updated and whose token is still alive
 		today := time.Now().UTC().Truncate(24 * time.Hour)

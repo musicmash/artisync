@@ -9,6 +9,10 @@ SELECT * FROM artist_daily_sync_tasks
 WHERE user_name = @user_name
 LIMIT 1;
 
+-- name: GetDailyLock :exec
+SELECT * from artist_daily_sync_tasks
+FOR UPDATE;
+
 -- name: ScheduleDailyTasks :execrows
 INSERT INTO artist_one_time_sync_tasks (user_name, state)
 SELECT
