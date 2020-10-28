@@ -39,7 +39,13 @@ func main() {
 	log.Debug(version.FullInfo)
 
 	log.Info("connecting to db...")
-	mgr, err := db.Connect(conf.DB.GetConnString())
+	mgr, err := db.Connect(db.Config{
+		DSN:                     conf.DB.GetConnString(),
+		MaxOpenConnectionsCount: conf.DB.MaxOpenConnections,
+		MaxIdleConnectionsCount: conf.DB.MaxIdleConnections,
+		MaxConnectionIdleTime:   conf.DB.MaxConnectionIdleTime,
+		MaxConnectionLifetime:   conf.DB.MaxConnectionLifeTime,
+	})
 	exitIfError(err)
 
 	log.Info("connection to the db established")

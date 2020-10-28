@@ -39,6 +39,10 @@ func TestConfig_Load(t *testing.T) {
 	assert.Equal(t, "artisync", conf.DB.Password)
 	assert.True(t, conf.DB.AutoMigrate)
 	assert.Equal(t, "file:///etc/artisync/migrations", conf.DB.MigrationsDir)
+	assert.Equal(t, 10, conf.DB.MaxOpenConnections)
+	assert.Equal(t, 10, conf.DB.MaxIdleConnections)
+	assert.Equal(t, 3*time.Minute, conf.DB.MaxConnectionIdleTime)
+	assert.Equal(t, 5*time.Minute, conf.DB.MaxConnectionLifeTime)
 
 	// log section
 	assert.Equal(t, conf.Log.Level, "INFO")
