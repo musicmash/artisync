@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -20,6 +21,18 @@ import (
 )
 
 func main() {
+	_ = flag.Bool("version", false, "show build info and exit")
+	if versionRequired() {
+		_, _ = fmt.Fprintln(os.Stdout, version.FullInfo)
+		os.Exit(0)
+	}
+
+	_ = flag.Bool("help", false, "show this message and exit")
+	if helpRequired() {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
 	configPath := flag.String("config", "", "abs path to conf file")
 	flag.Parse()
 
@@ -72,6 +85,23 @@ func main() {
 	<-done
 
 	log.Info("daily-sync finished")
+}
+
+func isArgProvided(argName string) bool {
+	for _, arg := range os.Args {
+		if strings.Contains(arg, argName) {
+			return true
+		}
+	}
+	return false
+}
+
+func helpRequired() bool {
+	return isArgProvided("-help")
+}
+
+func versionRequired() bool {
+	return isArgProvided("-version")
 }
 
 func exitIfError(err error) {

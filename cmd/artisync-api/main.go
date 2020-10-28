@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -21,6 +22,18 @@ import (
 
 //nolint:funclen
 func main() {
+	_ = flag.Bool("version", false, "show build info and exit")
+	if versionRequired() {
+		_, _ = fmt.Fprintln(os.Stdout, version.FullInfo)
+		os.Exit(0)
+	}
+
+	_ = flag.Bool("help", false, "show this message and exit")
+	if helpRequired() {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
 	configPath := flag.String("config", "", "abs path to conf file")
 	flag.Parse()
 
@@ -91,6 +104,23 @@ func gracefulShutdown(ctx context.Context, server *api.Server, quit <-chan os.Si
 		log.Errorf("could not gracefully shutdown the server: %v", err)
 	}
 	close(done)
+}
+
+func isArgProvided(argName string) bool {
+	for _, arg := range os.Args {
+		if strings.Contains(arg, argName) {
+			return true
+		}
+	}
+	return false
+}
+
+func helpRequired() bool {
+	return isArgProvided("-help")
+}
+
+func versionRequired() bool {
+	return isArgProvided("-version")
 }
 
 func exitIfError(err error) {
