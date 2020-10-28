@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/cron"
 	"github.com/musicmash/artisync/internal/db"
@@ -66,8 +64,8 @@ func main() {
 	if conf.DB.AutoMigrate {
 		log.Info("applying migrations..")
 		err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
-		if !errors.Is(err, migrate.ErrNoChange) {
-			exitIfError(fmt.Errorf("cant-t apply migrations: %w", err))
+		if err != nil {
+			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 		}
 	}
 

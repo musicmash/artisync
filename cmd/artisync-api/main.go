@@ -10,7 +10,6 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/golang-migrate/migrate/v4"
 	"github.com/musicmash/artisync/internal/api"
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/db"
@@ -67,7 +66,7 @@ func main() {
 	if conf.DB.AutoMigrate {
 		log.Info("applying migrations..")
 		err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
-		if err != nil && err != migrate.ErrNoChange {
+		if err != nil {
 			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 		}
 	}
