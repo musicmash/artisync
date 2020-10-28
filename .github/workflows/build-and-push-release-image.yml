@@ -2,7 +2,8 @@ on:
   push:
     branches:
       - master
-      - develop
+    tags:
+      - "v*"
 
 name: Build and push be image to github packages and docker hub
 
@@ -60,15 +61,15 @@ jobs:
              --target artisync-api \
              --cache-from $IMAGE_NAME-api-builder-stage:latest \
              --cache-from $IMAGE_NAME-api:latest \
-             --tag $IMAGE_NAME-api:latest \
-             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest \
+             --tag $IMAGE_NAME-api:${GITHUB_REF##*/} \
+             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/} \
              .
           docker build \
             --target artisync-daily \
             --cache-from $IMAGE_NAME-daily-builder-stage:latest \
             --cache-from $IMAGE_NAME-daily:latest \
-            --tag $IMAGE_NAME-daily:latest \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest \
+            --tag $IMAGE_NAME-daily:${GITHUB_REF##*/} \
+            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:${GITHUB_REF##*/} \
             .
 
       - name: Login to hubs
@@ -84,11 +85,11 @@ jobs:
         run: |
           docker push $IMAGE_NAME-api-builder-stage:latest
 
-          docker push $IMAGE_NAME-api:latest
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest
+          docker push $IMAGE_NAME-api:${GITHUB_REF##*/}
+          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/}
 
-          docker push $IMAGE_NAME-daily:latest
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest
+          docker push $IMAGE_NAME-daily:${GITHUB_REF##*/}
+          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-daily:${GITHUB_REF##*/}
 
       - name: Logout
         run: |
