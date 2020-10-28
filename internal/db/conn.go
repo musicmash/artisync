@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -21,8 +22,16 @@ type Conn struct {
 	db *sql.DB
 }
 
-func Connect(dsn string) (*Conn, error) {
-	db, err := sql.Open(driver, dsn)
+type Config struct {
+	DSN                     string
+	MaxOpenConnectionsCount int
+	MaxIdleConnectionsCount int
+	MaxConnectionIdleTime   time.Duration
+	MaxConnectionLifetime   time.Duration
+}
+
+func Connect(conf Config) (*Conn, error) {
+	db, err := sql.Open(driver, conf.DSN)
 	if err != nil {
 		return nil, err
 	}
@@ -30,6 +39,11 @@ func Connect(dsn string) (*Conn, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
+
+	db.SetMaxOpenConns(conf.MaxOpenConnectionsCount)
+	db.SetMaxIdleConns(conf.MaxIdleConnectionsCount)
+	db.SetConnMaxIdleTime(conf.MaxConnectionIdleTime)
+	db.SetConnMaxLifetime(conf.MaxConnectionLifetime)
 
 	return &Conn{db: db, Queries: models.New(db)}, nil
 }

@@ -11,6 +11,10 @@ db:
   name: ${DB_NAME}
   login: ${DB_USER}
   password: ${DB_PASSWORD}
+  max_open_connections: 10
+  max_idle_connections: 10
+  max_connection_life_time: 5m
+  max_connection_idle_time: 3m
   auto_migrate: true
   migrations_dir: file:///etc/artisync/migrations
 
