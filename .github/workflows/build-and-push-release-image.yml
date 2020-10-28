@@ -86,8 +86,6 @@ jobs:
 
       - name: Push image to hubs
         run: |
-          docker push $IMAGE_NAME-api-builder-stage:latest
-
           docker push $IMAGE_NAME-api:${GITHUB_REF##*/}
           docker push docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/}
 
