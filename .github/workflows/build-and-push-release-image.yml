@@ -5,11 +5,10 @@ on:
     tags:
       - "v*"
 
-name: Build and push be image to github packages and docker hub
+name: Build and push release image to github packages and docker hub
 
 jobs:
   build:
-    name: Build and push be image to github packages and docker hub
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: ${{ github.repository }}
