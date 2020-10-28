@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -86,7 +87,7 @@ func (conn *Conn) ApplyMigrations(filePath string) error {
 		"postgres",
 		driver,
 	)
-	if err != nil {
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("can't create migrate file driver: %w", err)
 	}
 

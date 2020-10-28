@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/cron"
 	"github.com/musicmash/artisync/internal/db"
@@ -20,6 +19,18 @@ import (
 )
 
 func main() {
+	_ = flag.Bool("version", false, "show build info and exit")
+	if versionRequired() {
+		_, _ = fmt.Fprintln(os.Stdout, version.FullInfo)
+		os.Exit(0)
+	}
+
+	_ = flag.Bool("help", false, "show this message and exit")
+	if helpRequired() {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
 	configPath := flag.String("config", "", "abs path to conf file")
 	flag.Parse()
 
@@ -53,8 +64,8 @@ func main() {
 	if conf.DB.AutoMigrate {
 		log.Info("applying migrations..")
 		err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
-		if !errors.Is(err, migrate.ErrNoChange) {
-			exitIfError(fmt.Errorf("cant-t apply migrations: %w", err))
+		if err != nil {
+			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 		}
 	}
 
@@ -72,6 +83,23 @@ func main() {
 	<-done
 
 	log.Info("daily-sync finished")
+}
+
+func isArgProvided(argName string) bool {
+	for _, arg := range os.Args {
+		if strings.Contains(arg, argName) {
+			return true
+		}
+	}
+	return false
+}
+
+func helpRequired() bool {
+	return isArgProvided("-help")
+}
+
+func versionRequired() bool {
+	return isArgProvided("-version")
 }
 
 func exitIfError(err error) {
