@@ -58,7 +58,7 @@ jobs:
             --target artisync-api \
             --build-arg RELEASE=${GITHUB_REF##*/} \
             --build-arg COMMIT=${GITHUB_SHA} \
-            --build-arg BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%S') \
+            --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
             --cache-from $IMAGE_NAME-api-builder-stage:latest \
             --cache-from $IMAGE_NAME-api:latest \
             --tag $IMAGE_NAME-api:${GITHUB_REF##*/} \
@@ -68,7 +68,7 @@ jobs:
             --target artisync-daily \
             --build-arg RELEASE=${GITHUB_REF##*/} \
             --build-arg COMMIT=${GITHUB_SHA} \
-            --build-arg BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%S') \
+            --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
             --cache-from $IMAGE_NAME-daily-builder-stage:latest \
             --cache-from $IMAGE_NAME-daily:latest \
             --tag $IMAGE_NAME-daily:${GITHUB_REF##*/} \
