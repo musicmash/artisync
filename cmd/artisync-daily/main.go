@@ -18,6 +18,7 @@ import (
 	"github.com/musicmash/artisync/internal/version"
 )
 
+//nolint:funclen
 func main() {
 	_ = flag.Bool("version", false, "show build info and exit")
 	if versionRequired() {
