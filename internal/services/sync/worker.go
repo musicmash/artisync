@@ -47,7 +47,7 @@ func (mgr *Mgr) processTask(ctx context.Context, task *models.GetNextOneTimeSync
 
 	// update state set done if pipeline finished without errors
 	if err := updateTaskState(ctx, mgr.conn, task.ID, models.TaskStateDone); err != nil {
-		return fmt.Errorf("can't update state for finished task with id %s", task.ID.String())
+		return fmt.Errorf("can't update state for finished task with id %s: %w", task.ID.String(), err)
 	}
 
 	return nil
