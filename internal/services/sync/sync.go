@@ -41,7 +41,7 @@ func (mgr *Mgr) RunWorkers(ctx context.Context) {
 	log.Infof("successfully spawn %d sync workers", mgr.conf.WorkersCount)
 }
 
-func (mgr *Mgr) WaitUntilAllWorkesFinish() {
+func (mgr *Mgr) WaitWorkers() {
 	var workerID uint8
 	for workerID = 1; workerID <= mgr.conf.WorkersCount; workerID++ {
 		<-mgr.done

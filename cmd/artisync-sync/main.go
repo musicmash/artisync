@@ -82,14 +82,14 @@ func main() {
 		TasksCount:   10,
 	})
 	task.RunWorkers(ctx)
-
 	done := cron.Schedule(ctx, 10*time.Second, task.Schedule)
+
 	<-interrupt
 	log.Info("got interrupt signal, shutdown..")
 	cancel()
 
 	<-done
-	task.WaitUntilAllWorkesFinish()
+	task.WaitWorkers()
 
 	log.Info("artisync-sync finished")
 }
