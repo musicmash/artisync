@@ -17,8 +17,8 @@ type Pipeline interface {
 }
 
 type PipelineData struct {
-	UserName    string
-	UserArtists []string
+	userName    string
+	userArtists []string
 	client      *spotify.Client
 }
 
@@ -43,7 +43,7 @@ func New(mgr *db.Conn) Pipeline {
 
 func (t *TaskPipeline) Run(ctx context.Context, opts *PipelineOpts) error {
 	data := &PipelineData{
-		UserName: opts.UserName,
+		userName: opts.UserName,
 	}
 	for i := range t.steps {
 		if err := t.steps[i](ctx, data); err != nil {
