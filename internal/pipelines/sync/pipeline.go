@@ -6,11 +6,17 @@ import (
 	"github.com/musicmash/artisync/internal/db"
 )
 
+type PipelineOpts struct {
+	UserName     string
+	RefreshToken string
+}
+
 type Pipeline interface {
-	Run(ctx context.Context) error
+	Run(ctx context.Context, opts *PipelineOpts) error
 }
 
 type PipelineData struct {
+	UserName    string
 	UserArtists []string
 }
 
@@ -32,8 +38,10 @@ func New(mgr *db.Conn) Pipeline {
 	}
 }
 
-func (t *TaskPipeline) Run(ctx context.Context) error {
-	data := &PipelineData{}
+func (t *TaskPipeline) Run(ctx context.Context, opts *PipelineOpts) error {
+	data := &PipelineData{
+		UserName: opts.UserName,
+	}
 	for i := range t.steps {
 		if err := t.steps[i](ctx, data); err != nil {
 			return err
