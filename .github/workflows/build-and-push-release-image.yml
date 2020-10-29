@@ -41,11 +41,6 @@ jobs:
           $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./internal/...
           $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./pkg/...
 
-      - name: Pull latest images
-        run: |
-          docker pull $IMAGE_NAME-api:latest || true
-          docker pull $IMAGE_NAME-daily:latest || true
-
       - name: Build the Docker image
         run: |
           docker build \
