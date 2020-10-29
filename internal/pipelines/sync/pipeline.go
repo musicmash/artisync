@@ -5,6 +5,7 @@ import (
 
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/zmb3/spotify"
+	"golang.org/x/oauth2"
 )
 
 type PipelineOpts struct {
@@ -17,21 +18,25 @@ type Pipeline interface {
 }
 
 type PipelineData struct {
-	userName    string
-	userArtists []string
-	client      *spotify.Client
+	userName     string
+	userArtists  []string
+	refreshToken string
+	client       spotify.Client
+	auth         oauth2.Config
 }
 
 type Step func(ctx context.Context, data *PipelineData) error
 
 type TaskPipeline struct {
 	conn  *db.Conn
+	auth  oauth2.Config
 	steps []Step
 }
 
-func New(mgr *db.Conn) Pipeline {
+func New(mgr *db.Conn, auth oauth2.Config) Pipeline {
 	return &TaskPipeline{
 		conn: mgr,
+		auth: auth,
 		steps: []Step{
 			PrepareSpotifyClient,
 			GetUserArtists,
@@ -43,7 +48,9 @@ func New(mgr *db.Conn) Pipeline {
 
 func (t *TaskPipeline) Run(ctx context.Context, opts *PipelineOpts) error {
 	data := &PipelineData{
-		userName: opts.UserName,
+		userName:     opts.UserName,
+		refreshToken: opts.RefreshToken,
+		auth:         t.auth,
 	}
 	for i := range t.steps {
 		if err := t.steps[i](ctx, data); err != nil {

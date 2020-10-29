@@ -75,7 +75,7 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	pipe := pipeline.New(mgr)
+	pipe := pipeline.New(mgr, *conf.Spotify.GetOAuthConfig())
 	task := sync.New(mgr, pipe, sync.WorkerConfig{
 		// TODO (m.kalinin): extract values into config
 		WorkersCount: 5,
