@@ -2,6 +2,11 @@ package sync
 
 import "context"
 
+func PrepareSpotifyClient(ctx context.Context, data *PipelineData) error {
+	// exchange access token and init client
+	return nil
+}
+
 func GetUserArtists(ctx context.Context, data *PipelineData) error {
 	// get user's top artists
 	// get artists followed by user

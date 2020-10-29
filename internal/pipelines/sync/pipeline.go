@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/musicmash/artisync/internal/db"
+	"github.com/zmb3/spotify"
 )
 
 type PipelineOpts struct {
@@ -18,6 +19,7 @@ type Pipeline interface {
 type PipelineData struct {
 	UserName    string
 	UserArtists []string
+	client      *spotify.Client
 }
 
 type Step func(ctx context.Context, data *PipelineData) error
@@ -31,6 +33,7 @@ func New(mgr *db.Conn) Pipeline {
 	return &TaskPipeline{
 		conn: mgr,
 		steps: []Step{
+			PrepareSpotifyClient,
 			GetUserArtists,
 			EnsureUserArtistsExists,
 			Subscribe,
