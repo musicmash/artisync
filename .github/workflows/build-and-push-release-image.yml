@@ -43,23 +43,16 @@ jobs:
 
       - name: Pull latest images
         run: |
-          docker pull $IMAGE_NAME-api-builder-stage:latest || true
           docker pull $IMAGE_NAME-api:latest || true
           docker pull $IMAGE_NAME-daily:latest || true
 
       - name: Build the Docker image
         run: |
           docker build \
-            --target builder \
-            --cache-from $IMAGE_NAME-api-builder-stage:latest \
-            -t $IMAGE_NAME-api-builder-stage \
-            .
-          docker build \
             --target artisync-api \
             --build-arg RELEASE=${GITHUB_REF##*/} \
             --build-arg COMMIT=${GITHUB_SHA} \
             --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
-            --cache-from $IMAGE_NAME-api-builder-stage:latest \
             --cache-from $IMAGE_NAME-api:latest \
             --tag $IMAGE_NAME-api:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/} \
@@ -69,7 +62,6 @@ jobs:
             --build-arg RELEASE=${GITHUB_REF##*/} \
             --build-arg COMMIT=${GITHUB_SHA} \
             --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
-            --cache-from $IMAGE_NAME-daily-builder-stage:latest \
             --cache-from $IMAGE_NAME-daily:latest \
             --tag $IMAGE_NAME-daily:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:${GITHUB_REF##*/} \
