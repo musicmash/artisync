@@ -14,13 +14,10 @@ import (
 	"github.com/musicmash/artisync/internal/cron"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
+	pipeline "github.com/musicmash/artisync/internal/pipelines/sync"
+	"github.com/musicmash/artisync/internal/services/sync"
 	"github.com/musicmash/artisync/internal/version"
 )
-
-func NoOp(ctx context.Context) error {
-	log.Info("noop triggered...")
-	return nil
-}
 
 //nolint:funclen
 func main() {
@@ -78,12 +75,21 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	done := cron.Schedule(ctx, 5*time.Minute, NoOp)
+	pipe := pipeline.New(mgr)
+	task := sync.New(mgr, pipe, sync.WorkerConfig{
+		// TODO (m.kalinin): extract values into config
+		WorkersCount: 5,
+		TasksCount:   10,
+	})
+	task.RunWorkers(ctx)
+
+	done := cron.Schedule(ctx, 10*time.Second, task.Schedule)
 	<-interrupt
 	log.Info("got interrupt signal, shutdown..")
 	cancel()
 
 	<-done
+	task.WaitUntilAllWorkesFinish()
 
 	log.Info("artisync-sync finished")
 }
