@@ -32,7 +32,7 @@ func TestConfig_Load(t *testing.T) {
 			Login:                 "artisync",
 			Password:              "artisync",
 			AutoMigrate:           true,
-			MigrationsDir:         "file:///etc/artisync/migrations",
+			MigrationsDir:         "file:///var/artisync/migrations",
 			MaxOpenConnections:    10,
 			MaxIdleConnections:    10,
 			MaxConnectionIdleTime: 3 * time.Minute,
