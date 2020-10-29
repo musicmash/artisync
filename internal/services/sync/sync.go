@@ -61,7 +61,7 @@ func (mgr *Mgr) Schedule(ctx context.Context) error {
 		}
 
 		if len(tasks) == 0 {
-			log.Warn("nothing to sync :(")
+			log.Debug("nothing to sync :(")
 			return nil
 		}
 
