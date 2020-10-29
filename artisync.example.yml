@@ -16,7 +16,7 @@ db:
   max_connection_life_time: 5m
   max_connection_idle_time: 3m
   auto_migrate: true
-  migrations_dir: file:///etc/artisync/migrations
+  migrations_dir: file:///var/artisync/migrations
 
 log:
   level: INFO

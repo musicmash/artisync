@@ -30,7 +30,7 @@ services:
       - test_db
     volumes:
       - ./:/go/src/artisync
-      - ./migrations:/etc/artisync/migrations
+      - ./migrations:/var/artisync/migrations
     working_dir: /go/src/artisync
     environment:
       - DB_HOST=artisync.db
