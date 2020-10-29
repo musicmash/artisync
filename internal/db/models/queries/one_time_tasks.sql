@@ -18,7 +18,7 @@ UPDATE artist_one_time_sync_tasks
 SET state = @state, details = @details
 WHERE id = @id;
 
--- name: GetNextScheduledTask :one
+-- name: GetNextOneTimeSyncTasks :many
 SELECT
     artist_one_time_sync_tasks.id,
     artist_one_time_sync_tasks.user_name,
@@ -27,5 +27,6 @@ FROM artist_one_time_sync_tasks
 LEFT JOIN artist_sync_refresh_tokens ON (
     artist_sync_refresh_tokens.user_name=artist_one_time_sync_tasks.user_name
 )
-WHERE state = 'scheduled' AND artist_sync_refresh_tokens.expired_at > now()
-LIMIT 1;
+WHERE state='created' AND artist_sync_refresh_tokens.expired_at > now()
+LIMIT $1
+FOR UPDATE;

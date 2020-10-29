@@ -30,7 +30,7 @@ func (q *Queries) CreateOneTimeSyncTask(ctx context.Context, userName string) (A
 	return i, err
 }
 
-const getNextScheduledTask = `-- name: GetNextScheduledTask :one
+const getNextOneTimeSyncTasks = `-- name: GetNextOneTimeSyncTasks :many
 SELECT
     artist_one_time_sync_tasks.id,
     artist_one_time_sync_tasks.user_name,
@@ -39,21 +39,38 @@ FROM artist_one_time_sync_tasks
 LEFT JOIN artist_sync_refresh_tokens ON (
     artist_sync_refresh_tokens.user_name=artist_one_time_sync_tasks.user_name
 )
-WHERE state = 'scheduled' AND artist_sync_refresh_tokens.expired_at > now()
-LIMIT 1
+WHERE state='created' AND artist_sync_refresh_tokens.expired_at > now()
+LIMIT $1
+FOR UPDATE
 `
 
-type GetNextScheduledTaskRow struct {
+type GetNextOneTimeSyncTasksRow struct {
 	ID           uuid.UUID `json:"id"`
 	UserName     string    `json:"user_name"`
 	RefreshToken string    `json:"refresh_token"`
 }
 
-func (q *Queries) GetNextScheduledTask(ctx context.Context) (GetNextScheduledTaskRow, error) {
-	row := q.db.QueryRowContext(ctx, getNextScheduledTask)
-	var i GetNextScheduledTaskRow
-	err := row.Scan(&i.ID, &i.UserName, &i.RefreshToken)
-	return i, err
+func (q *Queries) GetNextOneTimeSyncTasks(ctx context.Context, limit int32) ([]GetNextOneTimeSyncTasksRow, error) {
+	rows, err := q.db.QueryContext(ctx, getNextOneTimeSyncTasks, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetNextOneTimeSyncTasksRow
+	for rows.Next() {
+		var i GetNextOneTimeSyncTasksRow
+		if err := rows.Scan(&i.ID, &i.UserName, &i.RefreshToken); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getOneTimeSyncTaskState = `-- name: GetOneTimeSyncTaskState :one
