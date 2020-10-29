@@ -79,7 +79,7 @@ func main() {
 	task := sync.New(mgr, pipe, sync.WorkerConfig{
 		// TODO (m.kalinin): extract values into config
 		WorkersCount: 5,
-		TasksCount:   10,
+		TasksCount:   30,
 	})
 	task.RunWorkers(ctx)
 	done := cron.Schedule(ctx, 10*time.Second, task.Schedule)
