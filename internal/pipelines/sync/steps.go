@@ -113,15 +113,11 @@ func UniqueArtists(ctx context.Context, data *PipelineData) error {
 	return nil
 }
 
-func EnsureUserArtistsExists(ctx context.Context, data *PipelineData) error {
+func SubscribeUserOnArtists(ctx context.Context, data *PipelineData) error {
 	// iterate over artists:
 	//   get association with artist_id
 	//   check if association not exists
 	//     create artist, association
-	return nil
-}
-
-func SubscribeUserOnArtists(ctx context.Context, data *PipelineData) error {
-	// subscribe user on artists
+	//   subscribe user on artists
 	return nil
 }

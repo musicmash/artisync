@@ -42,7 +42,6 @@ func New(mgr *db.Conn, auth oauth2.Config) Pipeline {
 			GetUserTopArtists,
 			GetArtistsThatUserFollows,
 			UniqueArtists,
-			EnsureUserArtistsExists,
 			SubscribeUserOnArtists,
 		},
 	}
