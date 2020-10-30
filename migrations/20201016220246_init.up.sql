@@ -55,11 +55,5 @@ CREATE TABLE IF NOT EXISTS "spotify_artist_associations" (
     "store_name" varchar(255) NOT NULL,
     "store_id"   varchar(255) NOT NULL
 );
-CREATE TABLE IF NOT EXISTS "subscriptions" (
-    "id"         serial PRIMARY KEY,
-    "created_at" timestamp    NOT NULL DEFAULT now(),
-    "user_name"  varchar(255) NOT NULL,
-    "artist_id"  bigint       NOT NULL
-);
 
 COMMIT;

@@ -18,6 +18,17 @@ db:
   auto_migrate: true
   migrations_dir: file:///var/artisync/migrations
 
+musicmash_db:
+  host: musicmash.db
+  port: 6432
+  name: musicmash
+  login: musicmash
+  password: musicmash
+  max_open_connections: 15
+  max_idle_connections: 15
+  max_connection_life_time: 10m
+  max_connection_idle_time: 5m
+
 log:
   level: INFO
 

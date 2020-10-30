@@ -1,5 +1,4 @@
 -- name: CreateSubscription :exec
-INSERT INTO subscriptions (user_name, artist_id)
-SELECT @user_name, artist_id FROM spotify_artist_associations
-WHERE store_name = @store_name AND store_id = @store_id
-ON CONFLICT DO NOTHING;
+INSERT INTO spotify_subscriptions (created_at, user_name, artist_id)
+VALUES (now(), @user_name, @artist_id)
+ON CONFLICT  DO NOTHING;

@@ -23,20 +23,23 @@ type PipelineData struct {
 	refreshToken string
 	client       spotify.Client
 	auth         oauth2.Config
+	mashDB       *db.Conn
 }
 
 type Step func(ctx context.Context, data *PipelineData) error
 
 type TaskPipeline struct {
-	conn  *db.Conn
-	auth  oauth2.Config
-	steps []Step
+	mainDB *db.Conn
+	mashDB *db.Conn
+	auth   oauth2.Config
+	steps  []Step
 }
 
-func New(mgr *db.Conn, auth oauth2.Config) Pipeline {
+func New(mainDB, mashDB *db.Conn, auth oauth2.Config) Pipeline {
 	return &TaskPipeline{
-		conn: mgr,
-		auth: auth,
+		mainDB: mainDB,
+		mashDB: mashDB,
+		auth:   auth,
 		steps: []Step{
 			PrepareSpotifyClient,
 			GetUserTopArtists,
@@ -52,6 +55,7 @@ func (t *TaskPipeline) Run(ctx context.Context, opts *PipelineOpts) error {
 		userName:     opts.UserName,
 		refreshToken: opts.RefreshToken,
 		auth:         t.auth,
+		mashDB:       t.mashDB,
 	}
 	for i := range t.steps {
 		if err := t.steps[i](ctx, data); err != nil {

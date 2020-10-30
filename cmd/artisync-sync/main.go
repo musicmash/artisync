@@ -52,8 +52,8 @@ func main() {
 
 	log.Debug(version.FullInfo)
 
-	log.Info("connecting to db...")
-	mgr, err := db.Connect(db.Config{
+	log.Info("connecting to sync db...")
+	mainDB, err := db.Connect(db.Config{
 		DSN:                     conf.DB.GetConnString(),
 		MaxOpenConnectionsCount: conf.DB.MaxOpenConnections,
 		MaxIdleConnectionsCount: conf.DB.MaxIdleConnections,
@@ -66,19 +66,30 @@ func main() {
 
 	if conf.DB.AutoMigrate {
 		log.Info("applying migrations..")
-		err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
+		err = mainDB.ApplyMigrations(conf.DB.MigrationsDir)
 		if err != nil {
 			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 		}
 	}
+
+	log.Info("connecting to musicmash db...")
+	mashDB, err := db.Connect(db.Config{
+		DSN:                     conf.MashDB.GetConnString(),
+		MaxOpenConnectionsCount: conf.MashDB.MaxOpenConnections,
+		MaxIdleConnectionsCount: conf.MashDB.MaxIdleConnections,
+		MaxConnectionIdleTime:   conf.MashDB.MaxConnectionIdleTime,
+		MaxConnectionLifetime:   conf.MashDB.MaxConnectionLifeTime,
+	})
+	exitIfError(err)
+	log.Info("connection to the db established")
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
-	pipe := pipeline.New(mgr, *conf.Spotify.GetOAuthConfig())
-	task := sync.New(mgr, pipe, sync.WorkerConfig{
+	pipe := pipeline.New(mainDB, mashDB, *conf.Spotify.GetOAuthConfig())
+	task := sync.New(mainDB, pipe, sync.WorkerConfig{
 		// TODO (m.kalinin): extract values into config
 		WorkersCount: 5,
 		TasksCount:   30,

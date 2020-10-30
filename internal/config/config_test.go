@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:funlen
 func TestConfig_Load(t *testing.T) {
 	// arrange
 	assert.NoError(t, os.Setenv("DB_HOST", "artisync.db"))
@@ -37,6 +38,17 @@ func TestConfig_Load(t *testing.T) {
 			MaxIdleConnections:    10,
 			MaxConnectionIdleTime: 3 * time.Minute,
 			MaxConnectionLifeTime: 5 * time.Minute,
+		},
+		MashDB: DBConfig{
+			Host:                  "musicmash.db",
+			Port:                  6432,
+			Name:                  "musicmash",
+			Login:                 "musicmash",
+			Password:              "musicmash",
+			MaxOpenConnections:    15,
+			MaxIdleConnections:    15,
+			MaxConnectionIdleTime: 5 * time.Minute,
+			MaxConnectionLifeTime: 10 * time.Minute,
 		},
 		Log: LogConfig{
 			Level: "INFO",
