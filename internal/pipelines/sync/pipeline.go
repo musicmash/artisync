@@ -43,7 +43,7 @@ func New(mgr *db.Conn, auth oauth2.Config) Pipeline {
 			GetArtistsThatUserFollows,
 			UniqueArtists,
 			EnsureUserArtistsExists,
-			Subscribe,
+			SubscribeUserOnArtists,
 		},
 	}
 }

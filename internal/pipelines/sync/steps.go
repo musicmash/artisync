@@ -47,7 +47,7 @@ func EnsureUserArtistsExists(ctx context.Context, data *PipelineData) error {
 	return nil
 }
 
-func Subscribe(ctx context.Context, data *PipelineData) error {
+func SubscribeUserOnArtists(ctx context.Context, data *PipelineData) error {
 	// subscribe user on artists
 	return nil
 }
