@@ -27,10 +27,15 @@ func PrepareSpotifyClient(ctx context.Context, data *PipelineData) error {
 	return nil
 }
 
-func GetUserArtists(ctx context.Context, data *PipelineData) error {
-	// get user's top artists
-	// get artists followed by user
-	// make unique slice of artist id's
+func GetUserTopArtists(ctx context.Context, data *PipelineData) error {
+	return nil
+}
+
+func GetArtistsThatUserFollows(ctx context.Context, data *PipelineData) error {
+	return nil
+}
+
+func UniqueArtists(ctx context.Context, data *PipelineData) error {
 	return nil
 }
 

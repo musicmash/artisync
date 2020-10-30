@@ -39,7 +39,9 @@ func New(mgr *db.Conn, auth oauth2.Config) Pipeline {
 		auth: auth,
 		steps: []Step{
 			PrepareSpotifyClient,
-			GetUserArtists,
+			GetUserTopArtists,
+			GetArtistsThatUserFollows,
+			UniqueArtists,
 			EnsureUserArtistsExists,
 			Subscribe,
 		},
