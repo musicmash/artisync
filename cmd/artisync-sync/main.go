@@ -15,6 +15,7 @@ import (
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
 	pipeline "github.com/musicmash/artisync/internal/pipelines/sync"
+	"github.com/musicmash/artisync/internal/services/spotify/auth"
 	"github.com/musicmash/artisync/internal/services/sync"
 	"github.com/musicmash/artisync/internal/version"
 )
@@ -75,6 +76,7 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 
+	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
 	pipe := pipeline.New(mgr, *conf.Spotify.GetOAuthConfig())
 	task := sync.New(mgr, pipe, sync.WorkerConfig{
 		// TODO (m.kalinin): extract values into config

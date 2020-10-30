@@ -15,6 +15,7 @@ import (
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
 	pipeline "github.com/musicmash/artisync/internal/pipelines/syntask"
+	"github.com/musicmash/artisync/internal/services/spotify/auth"
 	task "github.com/musicmash/artisync/internal/services/syntask"
 	"github.com/musicmash/artisync/internal/version"
 )
@@ -77,6 +78,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
 	defer cancel()
 
+	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
 	syncPipeline := pipeline.New(conf.Spotify.GetOAuthConfig(), mgr)
 	syncTask := task.New(mgr, syncPipeline)
 	router := api.GetRouter(mgr, syncTask)
