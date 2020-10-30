@@ -2,6 +2,7 @@ package sync
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -28,6 +29,29 @@ func PrepareSpotifyClient(ctx context.Context, data *PipelineData) error {
 }
 
 func GetUserTopArtists(ctx context.Context, data *PipelineData) error {
+	artists := []spotify.FullArtist{}
+	results, err := data.client.CurrentUsersTopArtists()
+	if err != nil {
+		return fmt.Errorf("can't get user top artists: %w", err)
+	}
+
+	for page := 1; ; page++ {
+		artists = append(artists, results.Artists...)
+		if results.Total == len(artists) {
+			break
+		}
+
+		err = data.client.NextPage(results)
+		if errors.Is(err, spotify.ErrNoMorePages) {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("can't get next page with user top artists: %w", err)
+		}
+	}
+
+	log.Infof("got %d top artists for user", len(artists))
+	data.userArtists = artists
 	return nil
 }
 

@@ -19,7 +19,7 @@ type Pipeline interface {
 
 type PipelineData struct {
 	userName     string
-	userArtists  []string
+	userArtists  []spotify.FullArtist
 	refreshToken string
 	client       spotify.Client
 	auth         oauth2.Config
