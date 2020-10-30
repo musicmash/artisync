@@ -32,7 +32,7 @@ func PrepareSpotifyClient(ctx context.Context, data *PipelineData) error {
 
 func GetUserTopArtists(ctx context.Context, data *PipelineData) error {
 	var (
-		timeRange = "long"
+		timeRange = "medium"
 		limit     = 50
 	)
 	opts := spotify.Options{Timerange: &timeRange, Limit: &limit}
