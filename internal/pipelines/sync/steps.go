@@ -2,10 +2,12 @@ package sync
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
 
+	"github.com/musicmash/artisync/internal/db/models"
 	"github.com/musicmash/artisync/internal/log"
 	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
@@ -113,11 +115,72 @@ func UniqueArtists(ctx context.Context, data *PipelineData) error {
 	return nil
 }
 
+func getPoster(images []spotify.Image) string {
+	if len(images) == 0 {
+		return ""
+	}
+
+	return images[0].URL
+}
+
+//nolint:lll
+func createArtist(ctx context.Context, db *models.Queries, fullArtist *spotify.FullArtist) (models.SpotifyArtist, error) {
+	poster := getPoster(fullArtist.Images)
+	return db.CreateArtist(ctx, models.CreateArtistParams{
+		Name: fullArtist.Name,
+		Poster: sql.NullString{
+			String: poster,
+			Valid:  len(poster) > 0,
+		},
+	})
+}
+
+//nolint:lll
+func createAssociation(ctx context.Context, db *models.Queries, artistID int64, storeID string) (models.SpotifyArtistAssociation, error) {
+	return db.CreateArtistAssociation(ctx, models.CreateArtistAssociationParams{
+		ArtistID:  artistID,
+		StoreID:   storeID,
+		StoreName: "spotify",
+	})
+}
+
 func SubscribeUserOnArtists(ctx context.Context, data *PipelineData) error {
-	// iterate over artists:
-	//   get association with artist_id
-	//   check if association not exists
-	//     create artist, association
-	//   subscribe user on artists
+	err := data.mashDB.ExecTx(ctx, func(db *models.Queries) error {
+		for i := range data.userArtists {
+			artistStoreID := data.userArtists[i].ID.String()
+			association, err := db.GetArtistAssociation(ctx, models.GetArtistAssociationParams{
+				StoreID:   artistStoreID,
+				StoreName: "spotify",
+			})
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				artist, err := createArtist(ctx, db, &data.userArtists[i])
+				if err != nil {
+					return fmt.Errorf("can't create artist with spotify_id %s: %w", artistStoreID, err)
+				}
+
+				association, err = createAssociation(ctx, db, artist.ID, artistStoreID)
+				if err != nil {
+					return fmt.Errorf("can't create association for artist with spotify_id %s: %w", artistStoreID, err)
+				}
+			case err != nil:
+				return fmt.Errorf("cant get association for artist with spotify_id: %s: %w", artistStoreID, err)
+			}
+
+			err = db.CreateSubscription(ctx, models.CreateSubscriptionParams{
+				UserName: data.userName,
+				ArtistID: association.ArtistID,
+			})
+			if err != nil {
+				return fmt.Errorf("cant subscribe user on artist with spotify_id: %s: %w", artistStoreID, err)
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("can't commit tx: %w", err)
+	}
+
 	return nil
 }
