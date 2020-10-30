@@ -56,6 +56,31 @@ func GetUserTopArtists(ctx context.Context, data *PipelineData) error {
 }
 
 func GetArtistsThatUserFollows(ctx context.Context, data *PipelineData) error {
+	artists := []spotify.FullArtist{}
+	results, err := data.client.CurrentUsersFollowedArtists()
+	if err != nil {
+		return fmt.Errorf("can't get artists that user follows: %w", err)
+	}
+
+	for {
+		if len(results.Artists) == 0 {
+			break
+		}
+
+		artists = append(artists, results.Artists...)
+		if results.Total == len(artists) {
+			break
+		}
+
+		after := results.Artists[len(results.Artists)-1].ID.String()
+		results, err = data.client.CurrentUsersFollowedArtistsOpt(50, after)
+		if err != nil {
+			return fmt.Errorf("cen't get next page of followed artists: %w", err)
+		}
+	}
+
+	log.Infof("got %d artists that user follows", len(artists))
+	data.userArtists = append(data.userArtists, artists...)
 	return nil
 }
 
