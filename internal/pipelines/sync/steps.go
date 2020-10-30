@@ -85,6 +85,20 @@ func GetArtistsThatUserFollows(ctx context.Context, data *PipelineData) error {
 }
 
 func UniqueArtists(ctx context.Context, data *PipelineData) error {
+	uniqueArtists := []spotify.FullArtist{}
+	uniqueIDs := make(map[string]struct{}, len(data.userArtists))
+	for i := range data.userArtists {
+		artistID := data.userArtists[i].ID.String()
+		if _, exists := uniqueIDs[artistID]; exists {
+			continue
+		}
+
+		uniqueIDs[artistID] = struct{}{}
+		uniqueArtists = append(uniqueArtists, data.userArtists[i])
+	}
+
+	log.Infof("got %d unique artists from %d artists", len(uniqueArtists), len(data.userArtists))
+	data.userArtists = uniqueArtists
 	return nil
 }
 
