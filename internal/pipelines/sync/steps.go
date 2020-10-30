@@ -29,8 +29,14 @@ func PrepareSpotifyClient(ctx context.Context, data *PipelineData) error {
 }
 
 func GetUserTopArtists(ctx context.Context, data *PipelineData) error {
+	var (
+		timeRange = "long"
+		limit     = 50
+	)
+	opts := spotify.Options{Timerange: &timeRange, Limit: &limit}
+
 	artists := []spotify.FullArtist{}
-	results, err := data.client.CurrentUsersTopArtists()
+	results, err := data.client.CurrentUsersTopArtistsOpt(&opts)
 	if err != nil {
 		return fmt.Errorf("can't get user top artists: %w", err)
 	}
@@ -56,8 +62,13 @@ func GetUserTopArtists(ctx context.Context, data *PipelineData) error {
 }
 
 func GetArtistsThatUserFollows(ctx context.Context, data *PipelineData) error {
+	var (
+		after = ""
+		limit = 50
+	)
+
 	artists := []spotify.FullArtist{}
-	results, err := data.client.CurrentUsersFollowedArtists()
+	results, err := data.client.CurrentUsersFollowedArtistsOpt(limit, after)
 	if err != nil {
 		return fmt.Errorf("can't get artists that user follows: %w", err)
 	}
@@ -72,10 +83,10 @@ func GetArtistsThatUserFollows(ctx context.Context, data *PipelineData) error {
 			break
 		}
 
-		after := results.Artists[len(results.Artists)-1].ID.String()
-		results, err = data.client.CurrentUsersFollowedArtistsOpt(50, after)
+		after = results.Artists[len(results.Artists)-1].ID.String()
+		results, err = data.client.CurrentUsersFollowedArtistsOpt(limit, after)
 		if err != nil {
-			return fmt.Errorf("cen't get next page of followed artists: %w", err)
+			return fmt.Errorf("can't get next page with artists that user follows: %w", err)
 		}
 	}
 
