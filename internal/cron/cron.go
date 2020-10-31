@@ -23,7 +23,6 @@ func Schedule(ctx context.Context, duration time.Duration, task Task) <-chan str
 					log.Error(err.Error())
 				}
 			case <-ctx.Done():
-				log.Info("ctx done")
 				log.Info("cron-job finished")
 				ticker.Stop()
 				done <- struct{}{}

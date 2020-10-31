@@ -4,19 +4,19 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
-	"github.com/musicmash/artisync/internal/api"
 	"github.com/musicmash/artisync/internal/config"
+	"github.com/musicmash/artisync/internal/cron"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
-	pipeline "github.com/musicmash/artisync/internal/pipelines/syntask"
+	pipeline "github.com/musicmash/artisync/internal/pipelines/sync"
 	"github.com/musicmash/artisync/internal/services/spotify/auth"
-	task "github.com/musicmash/artisync/internal/services/syntask"
+	"github.com/musicmash/artisync/internal/services/sync"
 	"github.com/musicmash/artisync/internal/version"
 )
 
@@ -52,8 +52,8 @@ func main() {
 
 	log.Debug(version.FullInfo)
 
-	log.Info("connecting to db...")
-	mgr, err := db.Connect(db.Config{
+	log.Info("connecting to sync db...")
+	mainDB, err := db.Connect(db.Config{
 		DSN:                     conf.DB.GetConnString(),
 		MaxOpenConnectionsCount: conf.DB.MaxOpenConnections,
 		MaxIdleConnectionsCount: conf.DB.MaxIdleConnections,
@@ -66,45 +66,45 @@ func main() {
 
 	if conf.DB.AutoMigrate {
 		log.Info("applying migrations..")
-		err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
+		err = mainDB.ApplyMigrations(conf.DB.MigrationsDir)
 		if err != nil {
 			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
 		}
 	}
 
-	done := make(chan bool, 1)
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
-	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
-	defer cancel()
+	log.Info("connecting to musicmash db...")
+	mashDB, err := db.Connect(db.Config{
+		DSN:                     conf.MashDB.GetConnString(),
+		MaxOpenConnectionsCount: conf.MashDB.MaxOpenConnections,
+		MaxIdleConnectionsCount: conf.MashDB.MaxIdleConnections,
+		MaxConnectionIdleTime:   conf.MashDB.MaxConnectionIdleTime,
+		MaxConnectionLifetime:   conf.MashDB.MaxConnectionLifeTime,
+	})
+	exitIfError(err)
+	log.Info("connection to the db established")
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
-	syncPipeline := pipeline.New(conf.Spotify.GetOAuthConfig(), mgr)
-	syncTask := task.New(mgr, syncPipeline)
-	router := api.GetRouter(mgr, syncTask)
-	server := api.New(router, conf.HTTP)
+	pipe := pipeline.New(mainDB, mashDB, *conf.Spotify.GetOAuthConfig())
+	task := sync.New(mainDB, pipe, sync.WorkerConfig{
+		// TODO (m.kalinin): extract values into config
+		WorkersCount: 5,
+		TasksCount:   30,
+	})
+	task.RunWorkers(ctx)
+	done := cron.Schedule(ctx, 10*time.Second, task.Schedule)
 
-	go gracefulShutdown(ctx, server, quit, done)
-
-	log.Infof("server is ready to handle requests at: %v", server.Addr)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		exitIfError(fmt.Errorf("could not listen on %v: %v", server.Addr, err))
-	}
+	<-interrupt
+	log.Info("got interrupt signal, shutdown..")
+	cancel()
 
 	<-done
-	_ = mgr.Close()
-	log.Info("artisync-api stopped")
-}
+	task.WaitWorkers()
 
-func gracefulShutdown(ctx context.Context, server *api.Server, quit <-chan os.Signal, done chan<- bool) {
-	<-quit
-	log.Info("server is shutting down...")
-
-	server.SetKeepAlivesEnabled(false)
-	if err := server.Shutdown(ctx); err != nil {
-		log.Errorf("could not gracefully shutdown the server: %v", err)
-	}
-	close(done)
+	log.Info("artisync-sync finished")
 }
 
 func isArgProvided(argName string) bool {

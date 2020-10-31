@@ -7,6 +7,7 @@ all:
 build:
 	go build -ldflags="-s -w" -v -o dist/artisync-api ./cmd/artisync-api/...
 	go build -ldflags="-s -w" -v -o dist/artisync-daily ./cmd/artisync-daily/...
+	go build -ldflags="-s -w" -v -o dist/artisync-sync ./cmd/artisync-sync/...
 
 test t:
 	go test -v ./internal/...
@@ -20,6 +21,9 @@ run-api:
 
 run-daily:
 	go run -v ./cmd/artisync-daily/... --config ./artisync.example.yml
+
+run-sync:
+	go run -v ./cmd/artisync-sync/... --config ./artisync.example.yml
 
 compose:
 	docker-compose up -d --build

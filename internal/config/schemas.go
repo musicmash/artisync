@@ -9,6 +9,7 @@ import (
 type AppConfig struct {
 	Log     LogConfig  `yaml:"log"`
 	DB      DBConfig   `yaml:"db"`
+	MashDB  DBConfig   `yaml:"musicmash_db"`
 	HTTP    HTTPConfig `yaml:"http"`
 	Spotify Spotify    `yaml:"spotify"`
 }

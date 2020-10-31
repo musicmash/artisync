@@ -75,7 +75,7 @@ FROM
     artist_daily_sync_tasks AS daily
 LEFT JOIN artist_one_time_sync_tasks AS one
     ON daily.user_name = one.user_name
-AND one.created_at >= $1
+    AND one.created_at >= $1
 LEFT JOIN artist_sync_refresh_tokens AS token
     ON daily.user_name = token.user_name AND token.expired_at >= now()
 WHERE

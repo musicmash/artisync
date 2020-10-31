@@ -26,6 +26,7 @@ jobs:
         run: |
           go install -v ./cmd/artisync-api/...
           go install -v ./cmd/artisync-daily/...
+          go install -v ./cmd/artisync-sync/...
 
       - name: Test whole code
         run: |
@@ -62,6 +63,15 @@ jobs:
             --tag $IMAGE_NAME-daily:latest \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest \
             .
+          docker build \
+            --target artisync-sync \
+            --build-arg RELEASE=${GITHUB_REF##*/} \
+            --build-arg COMMIT=${GITHUB_SHA} \
+            --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
+            --cache-from $IMAGE_NAME-sync:latest \
+            --tag $IMAGE_NAME-sync:latest \
+            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-sync:latest \
+            .
 
       - name: Login to hubs
         env:
@@ -79,6 +89,9 @@ jobs:
 
           docker push $IMAGE_NAME-daily:latest
           docker push docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest
+
+          docker push $IMAGE_NAME-sync:latest
+          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-sync:latest
 
       - name: Logout
         run: |

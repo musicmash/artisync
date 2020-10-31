@@ -71,8 +71,8 @@ type SpotifyArtistAssociation struct {
 	StoreID   string `json:"store_id"`
 }
 
-type Subscription struct {
-	ID        int32     `json:"id"`
+type SpotifySubscription struct {
+	ID        int64     `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UserName  string    `json:"user_name"`
 	ArtistID  int64     `json:"artist_id"`
