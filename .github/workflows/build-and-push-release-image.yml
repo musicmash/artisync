@@ -36,6 +36,12 @@ jobs:
       - name: Install and run lints
         run: make lint
 
+      - name: Pull latest artisync images from GitHub Container Registry
+        run: |
+          docker pull ghcr.io/musicmash/artisync-api:latest     || true
+          docker pull ghcr.io/musicmash/artisync-daily:latest   || true
+          docker pull ghcr.io/musicmash/artisync-sync:latest    || true
+
       - name: Build artisync builder image
         run: |
           docker build \
@@ -47,9 +53,20 @@ jobs:
             .
       - name: Build artisync images
         run: |
-          docker build --file ./build/api/Dockerfile   --tag ghcr.io/musicmash/artisync-api:${GITHUB_REF##*/} .
-          docker build --file ./build/daily/Dockerfile --tag ghcr.io/musicmash/artisync-daily:${GITHUB_REF##*/} .
-          docker build --file ./build/sync/Dockerfile  --tag ghcr.io/musicmash/artisync-sync:${GITHUB_REF##*/} .
+          docker build \
+            --file ./build/api/Dockerfile   \
+            --cache-from ghcr.io/musicmash/artisync-api:latest \
+            --tag ghcr.io/musicmash/artisync-api:${GITHUB_REF##*/} .
+
+          docker build \
+            --file ./build/daily/Dockerfile \
+            --cache-from ghcr.io/musicmash/artisync-daily:latest \
+            --tag ghcr.io/musicmash/artisync-daily:${GITHUB_REF##*/} .
+
+          docker build \
+            --file ./build/sync/Dockerfile  \
+            --cache-from ghcr.io/musicmash/artisync-sync:latest \
+            --tag ghcr.io/musicmash/artisync-sync:${GITHUB_REF##*/} .
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
