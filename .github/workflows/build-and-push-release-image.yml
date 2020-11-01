@@ -46,6 +46,7 @@ jobs:
             --tag musicmash/artisync-builder:latest \
             .
       - name: Build artisync images
+        run: |
           docker build --file ./build/api/Dockerfile   --tag ghcr.io/musicmash/artisync-api:${GITHUB_REF##*/} .
           docker build --file ./build/daily/Dockerfile --tag ghcr.io/musicmash/artisync-daily:${GITHUB_REF##*/} .
           docker build --file ./build/sync/Dockerfile  --tag ghcr.io/musicmash/artisync-sync:${GITHUB_REF##*/} .
