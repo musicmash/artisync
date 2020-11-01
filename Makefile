@@ -9,6 +9,11 @@ build:
 	go build -ldflags="-s -w" -v -o dist/artisync-daily ./cmd/artisync-daily/...
 	go build -ldflags="-s -w" -v -o dist/artisync-sync ./cmd/artisync-sync/...
 
+install:
+	go install -v ./cmd/artisync-api/...
+	go install -v ./cmd/artisync-daily/...
+	go install -v ./cmd/artisync-sync/...
+
 test t:
 	go test -v ./internal/...
 
@@ -32,12 +37,10 @@ exec-sources:
 	docker exec -it artisync.sources bash
 
 image:
-	docker build \
-        --target artisync-api \
-		--build-arg RELEASE=${RELEASE} \
-		--build-arg COMMIT=${COMMIT} \
-		--build-arg BUILD_TIME=${BUILD_TIME} \
-		-t "musicmash/artisync-api:latest" .
+	docker build --file ./Dockerfile             --tag musicmash/artisync-builder:latest .
+	docker build --file ./build/api/Dockerfile   --tag musicmash/artisync-api:latest .
+	docker build --file ./build/daily/Dockerfile --tag musicmash/artisync-daily:latest .
+	docker build --file ./build/sync/Dockerfile  --tag musicmash/artisync-sync:latest .
 
 ensure-go-migrate-installed:
 	bash ./scripts/install-go-migrate.sh
