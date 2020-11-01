@@ -49,7 +49,7 @@ jobs:
           $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./internal/...
           $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./pkg/...
 
-      - name: Build the Docker image
+      - name: Build artisync builder image
         run: |
           docker build \
             --file ./Dockerfile \
@@ -58,18 +58,10 @@ jobs:
             --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
             --tag musicmash/artisync-builder:latest \
             .
-          docker build \
-            --file ./build/api/Dockerfile \
-            --tag ghcr.io/musicmash/artisync-api:latest \
-            .
-          docker build \
-            --file ./build/daily/Dockerfile \
-            --tag ghcr.io/musicmash/artisync-daily:latest \
-            .
-          docker build \
-            --file ./build/sync/Dockerfile \
-            --tag ghcr.io/musicmash/artisync-sync:latest \
-            .
+      - name: Build artisync images
+          docker build --file ./build/api/Dockerfile   --tag ghcr.io/musicmash/artisync-api:latest .
+          docker build --file ./build/daily/Dockerfile --tag ghcr.io/musicmash/artisync-daily:latest .
+          docker build --file ./build/sync/Dockerfile  --tag ghcr.io/musicmash/artisync-sync:latest .
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
