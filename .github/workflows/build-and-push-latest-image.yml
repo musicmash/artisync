@@ -67,7 +67,7 @@ jobs:
       - name: Build artisync images
         run: |
           docker build \
-            --file ./build/api/Dockerfile   \
+            --file ./build/api/Dockerfile \
             --squash \
             --compress \
             --cache-from ghcr.io/musicmash/artisync-api:latest \
@@ -81,7 +81,7 @@ jobs:
             --tag ghcr.io/musicmash/artisync-daily:latest .
 
           docker build \
-            --file ./build/sync/Dockerfile  \
+            --file ./build/sync/Dockerfile \
             --squash \
             --compress \
             --cache-from ghcr.io/musicmash/artisync-sync:latest \
