@@ -16,7 +16,7 @@ COPY go.sum go.sum
 COPY cmd cmd
 COPY internal internal
 
-RUN go build -v -a \
+RUN go build -v \
     -gcflags "all=-trimpath=${WORKDIR}" \
     -ldflags "-w -s \
        -X ${PROJECT}/internal/version.Release=${RELEASE} \
@@ -24,7 +24,7 @@ RUN go build -v -a \
        -X ${PROJECT}/internal/version.BuildTime=${BUILD_TIME}" \
     -o /usr/local/bin/artisync-api ./cmd/artisync-api/...
 
-RUN go build -v -a \
+RUN go build -v \
     -gcflags "all=-trimpath=${WORKDIR}" \
     -ldflags "-w -s \
        -X ${PROJECT}/internal/version.Release=${RELEASE} \
@@ -32,7 +32,7 @@ RUN go build -v -a \
        -X ${PROJECT}/internal/version.BuildTime=${BUILD_TIME}" \
     -o /usr/local/bin/artisync-daily ./cmd/artisync-daily/...
 
-RUN go build -v -a \
+RUN go build -v \
     -gcflags "all=-trimpath=${WORKDIR}" \
     -ldflags "-w -s \
        -X ${PROJECT}/internal/version.Release=${RELEASE} \
