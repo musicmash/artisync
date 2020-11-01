@@ -36,7 +36,7 @@ jobs:
       - name: Install and run lints
         run: make lint
 
-      - name: Build the Docker image
+      - name: Build artisync builder image
         run: |
           docker build \
             --file ./Dockerfile \
@@ -45,31 +45,20 @@ jobs:
             --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
             --tag musicmash/artisync-builder:latest \
             .
-          docker build \
-            --file ./build/api/Dockerfile \
-            --tag docker.pkg.github.com/${{ github.repository }}/artisync-api:${GITHUB_REF##*/} \
-            .
-          docker build \
-            --file ./build/daily/Dockerfile \
-            --tag docker.pkg.github.com/${{ github.repository }}/artisync-daily:${GITHUB_REF##*/} \
-            .
-          docker build \
-            --file ./build/sync/Dockerfile \
-            --tag docker.pkg.github.com/${{ github.repository }}/artisync-sync:${GITHUB_REF##*/} \
-            .
+      - name: Build artisync images
+          docker build --file ./build/api/Dockerfile   --tag ghcr.io/musicmash/artisync-api:${GITHUB_REF##*/} .
+          docker build --file ./build/daily/Dockerfile --tag ghcr.io/musicmash/artisync-daily:${GITHUB_REF##*/} .
+          docker build --file ./build/sync/Dockerfile  --tag ghcr.io/musicmash/artisync-sync:${GITHUB_REF##*/} .
 
-      - name: Login to github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
 
-      - name: Push image to github
+      - name: Push image to GitHub Container Registry
         run: |
-          docker push docker.pkg.github.com/${{ github.repository }}/artisync-api:${GITHUB_REF##*/}
-          docker push docker.pkg.github.com/${{ github.repository }}/artisync-daily:${GITHUB_REF##*/}
-          docker push docker.pkg.github.com/${{ github.repository }}/artisync-sync:${GITHUB_REF##*/}
-
-      - name: Logout from github
-        run: |
-          docker logout docker.pkg.github.com
+          docker push ghcr.io/musicmash/artisync-api:${GITHUB_REF##*/}
+          docker push ghcr.io/musicmash/artisync-daily:${GITHUB_REF##*/}
+          docker push ghcr.io/musicmash/artisync-sync:${GITHUB_REF##*/}
