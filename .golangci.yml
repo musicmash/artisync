@@ -32,4 +32,5 @@ linters:
     - testpackage
     - golint # until fix blank import
     - nlreturn
+    - exhaustivestruct
   fast: false

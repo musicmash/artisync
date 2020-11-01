@@ -66,10 +66,7 @@ func main() {
 
 	if conf.DB.AutoMigrate {
 		log.Info("applying migrations..")
-		err = mgr.ApplyMigrations(conf.DB.MigrationsDir)
-		if err != nil {
-			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
-		}
+		exitIfError(mgr.ApplyMigrations(conf.DB.MigrationsDir))
 	}
 
 	done := make(chan bool, 1)
