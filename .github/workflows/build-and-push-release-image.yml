@@ -45,24 +45,24 @@ jobs:
       - name: Build the Docker image
         run: |
           docker build \
-            --target artisync \
+            --file ./Dockerfile \
             --build-arg RELEASE=${GITHUB_REF##*/} \
             --build-arg COMMIT=${GITHUB_SHA} \
             --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
             --tag musicmash/artisync-builder:latest \
             .
           docker build \
-            --target artisync-api \
+            --file ./build/api/Dockerfile \
             --tag $IMAGE_NAME-api:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/} \
             .
           docker build \
-            --target artisync-daily \
+            --file ./build/daily/Dockerfile \
             --tag $IMAGE_NAME-daily:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:${GITHUB_REF##*/} \
             .
           docker build \
-            --target artisync-sync \
+            --file ./build/sync/Dockerfile \
             --tag $IMAGE_NAME-sync:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-sync:${GITHUB_REF##*/} \
             .
