@@ -11,7 +11,7 @@ import (
 func LoadFromFile(configPath string) (*AppConfig, error) {
 	b, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't load config from file: %w", err)
 	}
 
 	// replace ${ENV_NAME} in file with value from the environment
@@ -23,7 +23,7 @@ func LoadFromFile(configPath string) (*AppConfig, error) {
 func LoadFromBytes(val []byte) (*AppConfig, error) {
 	config := AppConfig{}
 	if err := yaml.Unmarshal(val, &config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't load config from bytes: %w", err)
 	}
 
 	return &config, nil

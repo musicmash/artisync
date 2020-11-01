@@ -66,10 +66,7 @@ func main() {
 
 	if conf.DB.AutoMigrate {
 		log.Info("applying migrations..")
-		err = mainDB.ApplyMigrations(conf.DB.MigrationsDir)
-		if err != nil {
-			exitIfError(fmt.Errorf("cant-t apply migrations: %v", err))
-		}
+		exitIfError(mainDB.ApplyMigrations(conf.DB.MigrationsDir))
 	}
 
 	log.Info("connecting to musicmash db...")

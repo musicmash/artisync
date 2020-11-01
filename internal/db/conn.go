@@ -34,11 +34,11 @@ type Config struct {
 func Connect(conf Config) (*Conn, error) {
 	db, err := sql.Open(driver, conf.DSN)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't open connect to database: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't ping database: %w", err)
 	}
 
 	db.SetMaxOpenConns(conf.MaxOpenConnectionsCount)
@@ -60,17 +60,17 @@ func (conn *Conn) Close() error {
 func (conn *Conn) ExecTx(ctx context.Context, fn func(*models.Queries) error) error {
 	tx, err := conn.db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't begin tx: %w", err)
 	}
 
 	q := models.New(tx)
-	err = fn(q)
-	if err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("tx err: %w, rb err: %v", err, rbErr)
+	if txErr := fn(q); txErr != nil {
+		if err = tx.Rollback(); err != nil {
+			//nolint:errorlint
+			return fmt.Errorf("tx err: %v, rb err: %w", txErr, err)
 		}
 
-		return err
+		return fmt.Errorf("pipeline failed: %w", err)
 	}
 
 	return tx.Commit()
@@ -96,5 +96,5 @@ func (conn *Conn) ApplyMigrations(filePath string) error {
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("can't apply migrations: %w", err)
 }

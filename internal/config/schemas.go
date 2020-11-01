@@ -32,7 +32,6 @@ type DBConfig struct {
 	Name                  string        `yaml:"name"`
 	Login                 string        `yaml:"login"`
 	Password              string        `yaml:"password"`
-	Log                   bool          `yaml:"log"`
 	AutoMigrate           bool          `yaml:"auto_migrate"`
 	MaxOpenConnections    int           `yaml:"max_open_connections"`
 	MaxIdleConnections    int           `yaml:"max_idle_connections"`
