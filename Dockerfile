@@ -1,4 +1,4 @@
-FROM golang:1-alpine as builder
+FROM golang:1-alpine as artisync
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
@@ -46,8 +46,8 @@ RUN addgroup -S artisync-api && adduser -S artisync-api -G artisync-api
 USER artisync-api
 WORKDIR /home/artisync-api
 
-COPY --from=builder --chown=artisync-api:artisync-api /var/artisync/migrations /var/artisync/migrations
-COPY --from=builder --chown=artisync-api:artisync-api /usr/local/bin/artisync-api /usr/local/bin/artisync-api
+COPY --from=musicmash/artisync-builder --chown=artisync-api:artisync-api /var/artisync/migrations /var/artisync/migrations
+COPY --from=musicmash/artisync-builder --chown=artisync-api:artisync-api /usr/local/bin/artisync-api /usr/local/bin/artisync-api
 
 ENTRYPOINT ["/usr/local/bin/artisync-api"]
 CMD []
@@ -58,8 +58,8 @@ RUN addgroup -S artisync-daily && adduser -S artisync-daily -G artisync-daily
 USER artisync-daily
 WORKDIR /home/artisync-daily
 
-COPY --from=builder --chown=artisync-daily:artisync-daily /var/artisync/migrations /var/artisync/migrations
-COPY --from=builder --chown=artisync-daily:artisync-daily /usr/local/bin/artisync-daily /usr/local/bin/artisync-daily
+COPY --from=musicmash/artisync-builder --chown=artisync-daily:artisync-daily /var/artisync/migrations /var/artisync/migrations
+COPY --from=musicmash/artisync-builder --chown=artisync-daily:artisync-daily /usr/local/bin/artisync-daily /usr/local/bin/artisync-daily
 
 ENTRYPOINT ["/usr/local/bin/artisync-daily"]
 CMD []
@@ -70,8 +70,8 @@ RUN addgroup -S artisync-sync && adduser -S artisync-sync -G artisync-sync
 USER artisync-sync
 WORKDIR /home/artisync-sync
 
-COPY --from=builder --chown=artisync-sync:artisync-sync /var/artisync/migrations /var/artisync/migrations
-COPY --from=builder --chown=artisync-sync:artisync-sync /usr/local/bin/artisync-sync /usr/local/bin/artisync-sync
+COPY --from=musicmash/artisync-builder --chown=artisync-sync:artisync-sync /var/artisync/migrations /var/artisync/migrations
+COPY --from=musicmash/artisync-builder --chown=artisync-sync:artisync-sync /usr/local/bin/artisync-sync /usr/local/bin/artisync-sync
 
 ENTRYPOINT ["/usr/local/bin/artisync-sync"]
 CMD []

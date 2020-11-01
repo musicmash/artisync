@@ -32,12 +32,10 @@ exec-sources:
 	docker exec -it artisync.sources bash
 
 image:
-	docker build \
-        --target artisync-api \
-		--build-arg RELEASE=${RELEASE} \
-		--build-arg COMMIT=${COMMIT} \
-		--build-arg BUILD_TIME=${BUILD_TIME} \
-		-t "musicmash/artisync-api:latest" .
+	docker build --target artisync 		 --tag musicmash/artisync-builder:latest .
+	docker build --target artisync-api   --tag musicmash/artisync-api:latest .
+	docker build --target artisync-daily --tag musicmash/artisync-daily:latest .
+	docker build --target artisync-sync  --tag musicmash/artisync-sync:latest .
 
 ensure-go-migrate-installed:
 	bash ./scripts/install-go-migrate.sh

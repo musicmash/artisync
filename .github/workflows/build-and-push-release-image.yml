@@ -45,29 +45,24 @@ jobs:
       - name: Build the Docker image
         run: |
           docker build \
-            --target artisync-api \
+            --target artisync \
             --build-arg RELEASE=${GITHUB_REF##*/} \
             --build-arg COMMIT=${GITHUB_SHA} \
             --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
-            --cache-from $IMAGE_NAME-api:latest \
+            --tag musicmash/artisync-builder:latest \
+            .
+          docker build \
+            --target artisync-api \
             --tag $IMAGE_NAME-api:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/} \
             .
           docker build \
             --target artisync-daily \
-            --build-arg RELEASE=${GITHUB_REF##*/} \
-            --build-arg COMMIT=${GITHUB_SHA} \
-            --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
-            --cache-from $IMAGE_NAME-daily:latest \
             --tag $IMAGE_NAME-daily:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:${GITHUB_REF##*/} \
             .
           docker build \
             --target artisync-sync \
-            --build-arg RELEASE=${GITHUB_REF##*/} \
-            --build-arg COMMIT=${GITHUB_SHA} \
-            --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S') \
-            --cache-from $IMAGE_NAME-sync:latest \
             --tag $IMAGE_NAME-sync:${GITHUB_REF##*/} \
             --tag docker.pkg.github.com/$IMAGE_NAME/artisync-sync:${GITHUB_REF##*/} \
             .
