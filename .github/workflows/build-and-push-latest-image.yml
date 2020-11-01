@@ -29,24 +29,13 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Install artisync binaries
-        run: |
-          go install -v ./cmd/artisync-api/...
-          go install -v ./cmd/artisync-daily/...
-          go install -v ./cmd/artisync-sync/...
+        run: make install
 
       - name: Test whole code
-        run: |
-          make t
+        run: make test
 
       - name: Install and run lints
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
-          $(go env GOPATH)/bin/golangci-lint -v run
-
-          go get -u github.com/mgechev/revive
-          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./cmd/...
-          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./internal/...
-          $(go env GOPATH)/bin/revive --config ./.revive.toml --formatter stylish ./pkg/...
+        run: make lint
 
       - name: Build artisync builder image
         run: |
