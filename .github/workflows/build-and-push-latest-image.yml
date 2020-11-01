@@ -4,7 +4,7 @@ on:
       - master
       - develop
 
-name: Build and push latest image to github packages and docker hub
+name: Build and push latest image to github container registry
 
 jobs:
   build:

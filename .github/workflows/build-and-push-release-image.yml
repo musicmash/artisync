@@ -3,7 +3,7 @@ on:
     tags:
       - "v*"
 
-name: Build and push release image to github packages and docker hub
+name: Build and push release image to github container registry
 
 jobs:
   build:
