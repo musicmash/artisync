@@ -45,6 +45,8 @@ jobs:
       - name: Build artisync builder image
         run: |
           docker build \
+            --squash \
+            --compress \
             --file ./Dockerfile \
             --build-arg RELEASE=${GITHUB_REF##*/} \
             --build-arg COMMIT=${GITHUB_SHA} \
@@ -54,17 +56,23 @@ jobs:
       - name: Build artisync images
         run: |
           docker build \
-            --file ./build/api/Dockerfile   \
+            --squash \
+            --compress \
+            --file ./build/api/Dockerfile \
             --cache-from ghcr.io/musicmash/artisync-api:latest \
             --tag ghcr.io/musicmash/artisync-api:${GITHUB_REF##*/} .
 
           docker build \
+            --squash \
+            --compress \
             --file ./build/daily/Dockerfile \
             --cache-from ghcr.io/musicmash/artisync-daily:latest \
             --tag ghcr.io/musicmash/artisync-daily:${GITHUB_REF##*/} .
 
           docker build \
-            --file ./build/sync/Dockerfile  \
+            --squash \
+            --compress \
+            --file ./build/sync/Dockerfile \
             --cache-from ghcr.io/musicmash/artisync-sync:latest \
             --tag ghcr.io/musicmash/artisync-sync:${GITHUB_REF##*/} .
 
