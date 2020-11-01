@@ -8,8 +8,6 @@ name: Build and push release image to github packages and docker hub
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ${{ github.repository }}
 
     steps:
       - name: Checkout
@@ -53,41 +51,29 @@ jobs:
             .
           docker build \
             --file ./build/api/Dockerfile \
-            --tag $IMAGE_NAME-api:${GITHUB_REF##*/} \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/} \
+            --tag docker.pkg.github.com/${{ github.repository }}/artisync-api:${GITHUB_REF##*/} \
             .
           docker build \
             --file ./build/daily/Dockerfile \
-            --tag $IMAGE_NAME-daily:${GITHUB_REF##*/} \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:${GITHUB_REF##*/} \
+            --tag docker.pkg.github.com/${{ github.repository }}/artisync-daily:${GITHUB_REF##*/} \
             .
           docker build \
             --file ./build/sync/Dockerfile \
-            --tag $IMAGE_NAME-sync:${GITHUB_REF##*/} \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-sync:${GITHUB_REF##*/} \
+            --tag docker.pkg.github.com/${{ github.repository }}/artisync-sync:${GITHUB_REF##*/} \
             .
 
-      - name: Login to hubs
+      - name: Login to github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKERHUB_ACTOR: ${{ secrets.DOCKERHUB_ACTOR }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          docker login docker.pkg.github.com -u $GITHUB_ACTOR    -p $GITHUB_TOKEN
-          docker login                       -u $DOCKERHUB_ACTOR -p $DOCKERHUB_TOKEN
+          docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
 
-      - name: Push image to hubs
+      - name: Push image to github
         run: |
-          docker push $IMAGE_NAME-api:${GITHUB_REF##*/}
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-api:${GITHUB_REF##*/}
+          docker push docker.pkg.github.com/${{ github.repository }}/artisync-api:${GITHUB_REF##*/}
+          docker push docker.pkg.github.com/${{ github.repository }}/artisync-daily:${GITHUB_REF##*/}
+          docker push docker.pkg.github.com/${{ github.repository }}/artisync-sync:${GITHUB_REF##*/}
 
-          docker push $IMAGE_NAME-daily:${GITHUB_REF##*/}
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-daily:${GITHUB_REF##*/}
-
-          docker push $IMAGE_NAME-sync:${GITHUB_REF##*/}
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-sync:${GITHUB_REF##*/}
-
-      - name: Logout
+      - name: Logout from github
         run: |
           docker logout docker.pkg.github.com
-          docker logout

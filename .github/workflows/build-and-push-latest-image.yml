@@ -9,8 +9,6 @@ name: Build and push latest image to github packages and docker hub
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ${{ github.repository }}
 
     steps:
       - name: Checkout
@@ -54,41 +52,29 @@ jobs:
             .
           docker build \
             --file ./build/api/Dockerfile \
-            --tag $IMAGE_NAME-api:latest \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest \
+            --tag docker.pkg.github.com/${{ github.repository }}/artisync-api:latest \
             .
           docker build \
             --file ./build/daily/Dockerfile \
-            --tag $IMAGE_NAME-daily:latest \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest \
+            --tag docker.pkg.github.com/${{ github.repository }}/artisync-daily:latest \
             .
           docker build \
             --file ./build/sync/Dockerfile \
-            --tag $IMAGE_NAME-sync:latest \
-            --tag docker.pkg.github.com/$IMAGE_NAME/artisync-sync:latest \
+            --tag docker.pkg.github.com/${{ github.repository }}/artisync-sync:latest \
             .
 
-      - name: Login to hubs
+      - name: Login to github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKERHUB_ACTOR: ${{ secrets.DOCKERHUB_ACTOR }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          docker login docker.pkg.github.com -u $GITHUB_ACTOR    -p $GITHUB_TOKEN
-          docker login                       -u $DOCKERHUB_ACTOR -p $DOCKERHUB_TOKEN
+          docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
 
-      - name: Push image to hubs
+      - name: Push image to github
         run: |
-          docker push $IMAGE_NAME-api:latest
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-api:latest
+          docker push docker.pkg.github.com/${{ github.repository }}/artisync-api:latest
+          docker push docker.pkg.github.com/${{ github.repository }}/artisync-daily:latest
+          docker push docker.pkg.github.com/${{ github.repository }}/artisync-sync:latest
 
-          docker push $IMAGE_NAME-daily:latest
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-daily:latest
-
-          docker push $IMAGE_NAME-sync:latest
-          docker push docker.pkg.github.com/$IMAGE_NAME/artisync-sync:latest
-
-      - name: Logout
+      - name: Logout from github
         run: |
           docker logout docker.pkg.github.com
-          docker logout
