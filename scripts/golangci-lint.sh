@@ -6,4 +6,4 @@ if ! which golangci-lint > /dev/null; then
 fi
 
 echo "==> Checking golangci-ling..."
-golangci-lint -v run
+$(go env GOPATH)/bin/golangci-lint -v run
