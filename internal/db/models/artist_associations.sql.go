@@ -8,7 +8,7 @@ import (
 )
 
 const createArtistAssociation = `-- name: CreateArtistAssociation :one
-INSERT INTO spotify_artist_associations (artist_id, store_name, store_id)
+INSERT INTO artist_associations (artist_id, store_name, store_id)
 VALUES ($1, $2, $3)
 ON CONFLICT DO NOTHING
 RETURNING id, artist_id, store_name, store_id
@@ -20,9 +20,9 @@ type CreateArtistAssociationParams struct {
 	StoreID   string `json:"store_id"`
 }
 
-func (q *Queries) CreateArtistAssociation(ctx context.Context, arg CreateArtistAssociationParams) (SpotifyArtistAssociation, error) {
+func (q *Queries) CreateArtistAssociation(ctx context.Context, arg CreateArtistAssociationParams) (ArtistAssociation, error) {
 	row := q.db.QueryRowContext(ctx, createArtistAssociation, arg.ArtistID, arg.StoreName, arg.StoreID)
-	var i SpotifyArtistAssociation
+	var i ArtistAssociation
 	err := row.Scan(
 		&i.ID,
 		&i.ArtistID,
@@ -33,7 +33,7 @@ func (q *Queries) CreateArtistAssociation(ctx context.Context, arg CreateArtistA
 }
 
 const getArtistAssociation = `-- name: GetArtistAssociation :one
-SELECT id, artist_id, store_name, store_id FROM spotify_artist_associations
+SELECT id, artist_id, store_name, store_id FROM artist_associations
 WHERE store_name = $1 and store_id = $2
 LIMIT 1
 `
@@ -43,9 +43,9 @@ type GetArtistAssociationParams struct {
 	StoreID   string `json:"store_id"`
 }
 
-func (q *Queries) GetArtistAssociation(ctx context.Context, arg GetArtistAssociationParams) (SpotifyArtistAssociation, error) {
+func (q *Queries) GetArtistAssociation(ctx context.Context, arg GetArtistAssociationParams) (ArtistAssociation, error) {
 	row := q.db.QueryRowContext(ctx, getArtistAssociation, arg.StoreName, arg.StoreID)
-	var i SpotifyArtistAssociation
+	var i ArtistAssociation
 	err := row.Scan(
 		&i.ID,
 		&i.ArtistID,

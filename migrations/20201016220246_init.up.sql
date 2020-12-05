@@ -43,13 +43,13 @@ CREATE INDEX "idx_artist_sync_refresh_tokens_expired_at" ON "artist_sync_refresh
 CREATE UNIQUE INDEX "idx_artist_sync_refresh_tokens_user_name" ON "artist_sync_refresh_tokens" ("user_name");
 
 -- should be equal to schemas from musicmash
-CREATE TABLE IF NOT EXISTS "spotify_artists" (
+CREATE TABLE IF NOT EXISTS "artists" (
     "id"         bigserial PRIMARY KEY,
     "created_at" timestamp    NOT NULL DEFAULT now(),
     "name"       varchar(255) NOT NULL,
     "poster"     varchar(255)
 );
-CREATE TABLE IF NOT EXISTS "spotify_artist_associations" (
+CREATE TABLE IF NOT EXISTS "artist_associations" (
     "id"         serial PRIMARY KEY,
     "artist_id"  bigint       NOT NULL,
     "store_name" varchar(255) NOT NULL,

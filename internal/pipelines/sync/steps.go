@@ -124,7 +124,7 @@ func getPoster(images []spotify.Image) string {
 }
 
 //nolint:lll
-func createArtist(ctx context.Context, db *models.Queries, fullArtist *spotify.FullArtist) (models.SpotifyArtist, error) {
+func createArtist(ctx context.Context, db *models.Queries, fullArtist *spotify.FullArtist) (models.Artist, error) {
 	poster := getPoster(fullArtist.Images)
 	return db.CreateArtist(ctx, models.CreateArtistParams{
 		Name: fullArtist.Name,
@@ -136,7 +136,7 @@ func createArtist(ctx context.Context, db *models.Queries, fullArtist *spotify.F
 }
 
 //nolint:lll
-func createAssociation(ctx context.Context, db *models.Queries, artistID int64, storeID string) (models.SpotifyArtistAssociation, error) {
+func createAssociation(ctx context.Context, db *models.Queries, artistID int64, storeID string) (models.ArtistAssociation, error) {
 	return db.CreateArtistAssociation(ctx, models.CreateArtistAssociationParams{
 		ArtistID:  artistID,
 		StoreID:   storeID,

@@ -6,8 +6,8 @@ DROP TABLE IF EXISTS "artist_sync_refresh_tokens";
 
 -- should be equal to schemas from musicmash
 DROP TABLE IF EXISTS "subscriptions";
-DROP TABLE IF EXISTS "spotify_artist_associations";
-DROP TABLE IF EXISTS "spotify_artists";
+DROP TABLE IF EXISTS "artist_associations";
+DROP TABLE IF EXISTS "artists";
 
 DROP TYPE IF EXISTS task_state;
 
