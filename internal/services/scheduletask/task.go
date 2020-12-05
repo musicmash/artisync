@@ -25,12 +25,9 @@ func (t *Task) Schedule(ctx context.Context) error {
 			return fmt.Errorf("can't get lock: %w", err)
 		}
 
-		// schedule tasks for users that weren't updated and whose token is still alive
+		// schedule tasks for users who didn't run sync today and whose token is still alive
 		today := time.Now().UTC().Truncate(24 * time.Hour)
-		count, err := db.ScheduleDailyTasks(ctx, models.ScheduleDailyTasksParams{
-			Today:     today,
-			Yesterday: today.Add(-24 * time.Hour),
-		})
+		count, err := db.ScheduleDailyTasks(ctx, today)
 		if err != nil {
 			return fmt.Errorf("can't schedule daily tasks: %w", err)
 		}

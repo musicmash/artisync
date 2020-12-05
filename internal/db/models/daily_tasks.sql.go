@@ -73,24 +73,15 @@ SELECT
     daily.user_name, 'created'
 FROM
     artist_daily_sync_tasks AS daily
-LEFT JOIN artist_one_time_sync_tasks AS one
-    ON daily.user_name = one.user_name
-    AND one.created_at >= $1
-LEFT JOIN artist_sync_refresh_tokens AS token
-    ON daily.user_name = token.user_name AND token.expired_at >= now()
-WHERE
-    daily.updated_at < $2
-    AND one.created_at IS NULL
-    AND token.value != ''
+    LEFT JOIN artist_one_time_sync_tasks AS one ON daily.user_name = one.user_name
+        AND one.created_at >= $1
+    LEFT JOIN artist_sync_refresh_tokens AS token ON daily.user_name = token.user_name
+        AND token.expired_at >= $1
+WHERE one.created_at IS NULL AND token.value != ''
 `
 
-type ScheduleDailyTasksParams struct {
-	Yesterday time.Time `json:"yesterday"`
-	Today     time.Time `json:"today"`
-}
-
-func (q *Queries) ScheduleDailyTasks(ctx context.Context, arg ScheduleDailyTasksParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, scheduleDailyTasks, arg.Yesterday, arg.Today)
+func (q *Queries) ScheduleDailyTasks(ctx context.Context, today time.Time) (int64, error) {
+	result, err := q.db.ExecContext(ctx, scheduleDailyTasks, today)
 	if err != nil {
 		return 0, err
 	}
