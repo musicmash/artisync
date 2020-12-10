@@ -8,7 +8,7 @@ import (
 )
 
 const createSubscription = `-- name: CreateSubscription :exec
-INSERT INTO spotify_subscriptions (created_at, user_name, artist_id)
+INSERT INTO subscriptions (created_at, user_name, artist_id)
 VALUES (now(), $1, $2)
 ON CONFLICT  DO NOTHING
 `

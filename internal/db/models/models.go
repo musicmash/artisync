@@ -33,6 +33,20 @@ func (e *TaskState) Scan(src interface{}) error {
 	return nil
 }
 
+type Artist struct {
+	ID        int64          `json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	Name      string         `json:"name"`
+	Poster    sql.NullString `json:"poster"`
+}
+
+type ArtistAssociation struct {
+	ID        int32  `json:"id"`
+	ArtistID  int64  `json:"artist_id"`
+	StoreName string `json:"store_name"`
+	StoreID   string `json:"store_id"`
+}
+
 type ArtistDailySyncTask struct {
 	ID        uuid.UUID `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -57,21 +71,7 @@ type ArtistSyncRefreshToken struct {
 	Value     string    `json:"value"`
 }
 
-type SpotifyArtist struct {
-	ID        int64          `json:"id"`
-	CreatedAt time.Time      `json:"created_at"`
-	Name      string         `json:"name"`
-	Poster    sql.NullString `json:"poster"`
-}
-
-type SpotifyArtistAssociation struct {
-	ID        int32  `json:"id"`
-	ArtistID  int64  `json:"artist_id"`
-	StoreName string `json:"store_name"`
-	StoreID   string `json:"store_id"`
-}
-
-type SpotifySubscription struct {
+type Subscription struct {
 	ID        int64     `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UserName  string    `json:"user_name"`
