@@ -20,6 +20,16 @@ func (q *Queries) CreateDailySyncTask(ctx context.Context, userName string) erro
 	return err
 }
 
+const disableDailySyncTask = `-- name: DisableDailySyncTask :exec
+DELETE FROM artist_daily_sync_tasks
+WHERE user_name = $1
+`
+
+func (q *Queries) DisableDailySyncTask(ctx context.Context, userName string) error {
+	_, err := q.db.ExecContext(ctx, disableDailySyncTask, userName)
+	return err
+}
+
 const getDailyLock = `-- name: GetDailyLock :exec
 SELECT id, created_at, updated_at, user_name from artist_daily_sync_tasks
 FOR UPDATE

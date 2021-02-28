@@ -8,6 +8,12 @@ INSERT INTO artist_one_time_sync_tasks (user_name)
 VALUES (@user_name)
 RETURNING *;
 
+-- name: GetLatestOneTimeSyncTask :one
+SELECT * FROM artist_one_time_sync_tasks
+WHERE user_name = @user_name
+ORDER BY created_at DESC
+LIMIT 1;
+
 -- name: GetOneTimeSyncTaskState :one
 SELECT id, state, details FROM artist_one_time_sync_tasks
 WHERE id = @id
