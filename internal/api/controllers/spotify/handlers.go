@@ -54,6 +54,6 @@ func (c *Controller) ProcessCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("/onboarding/artist-sync?task_id=%v", task.ID.String())
+	url := fmt.Sprintf("/subscriptions?task_id=%v", task.ID.String())
 	http.Redirect(w, r, url, http.StatusMovedPermanently)
 }
