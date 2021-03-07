@@ -28,9 +28,9 @@ func GetRouter(conn *db.Conn, mgr *syntask.Mgr, dailyMgr *dailyservice.Mgr) chi.
 		// to avoid logging of healthz requests
 		r.Use(middleware.Logger)
 
-		r.Mount("/sync/daily", daily.New(dailyMgr).GetRouter())
-		r.Mount("/sync/connect", spotify.New(mgr).GetRouter())
-		r.Mount("/tasks", tasks.New(mgr).GetRouter())
+		r.Mount("/artists/sync/daily", daily.New(dailyMgr).GetRouter())
+		r.Mount("/artists/sync/connect", spotify.New(mgr).GetRouter())
+		r.Mount("/artists/sync/tasks", tasks.New(mgr).GetRouter())
 	})
 
 	return r
