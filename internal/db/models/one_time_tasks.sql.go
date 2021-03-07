@@ -30,6 +30,27 @@ func (q *Queries) CreateOneTimeSyncTask(ctx context.Context, userName string) (A
 	return i, err
 }
 
+const getLatestOneTimeSyncTask = `-- name: GetLatestOneTimeSyncTask :one
+SELECT id, created_at, updated_at, user_name, state, details FROM artist_one_time_sync_tasks
+WHERE user_name = $1
+ORDER BY created_at DESC
+LIMIT 1
+`
+
+func (q *Queries) GetLatestOneTimeSyncTask(ctx context.Context, userName string) (ArtistOneTimeSyncTask, error) {
+	row := q.db.QueryRowContext(ctx, getLatestOneTimeSyncTask, userName)
+	var i ArtistOneTimeSyncTask
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserName,
+		&i.State,
+		&i.Details,
+	)
+	return i, err
+}
+
 const getNextOneTimeSyncTasks = `-- name: GetNextOneTimeSyncTasks :many
 SELECT
     artist_one_time_sync_tasks.id,

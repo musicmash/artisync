@@ -4,6 +4,10 @@ VALUES (@user_name)
 ON CONFLICT (user_name)
 DO UPDATE SET updated_at = now();
 
+-- name: DisableDailySyncTask :exec
+DELETE FROM artist_daily_sync_tasks
+WHERE user_name = @user_name;
+
 -- name: GetUserDailySyncTask :one
 SELECT * FROM artist_daily_sync_tasks
 WHERE user_name = @user_name

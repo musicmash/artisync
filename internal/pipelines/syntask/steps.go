@@ -2,6 +2,8 @@ package syntask
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/musicmash/artisync/internal/db/models"
@@ -19,9 +21,15 @@ func GetRefreshTokenStep(ctx context.Context, opts *PipelineOpts, data *Pipeline
 
 func ScheduleSyncTaskStep(ctx context.Context, opts *PipelineOpts, data *PipelineData) error {
 	err := data.conn.ExecTx(ctx, func(db *models.Queries) error {
-		task, err := db.CreateOneTimeSyncTask(ctx, opts.UserName)
+		task, err := db.IsAnySyncTaskProcessingForUser(ctx, opts.UserName)
+		if errors.Is(err, sql.ErrNoRows) {
+			task, err = db.CreateOneTimeSyncTask(ctx, opts.UserName)
+			if err != nil {
+				return fmt.Errorf("can't create one-time sync task for %v: %w", opts.UserName, err)
+			}
+		}
 		if err != nil {
-			return fmt.Errorf("can't create one-time sync task for %v: %w", opts.UserName, err)
+			return fmt.Errorf("can't get one-time sync task for %v: %w", opts.UserName, err)
 		}
 
 		if opts.ScheduleDailySync {
