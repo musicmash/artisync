@@ -76,7 +76,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
 	defer cancel()
 
-	exitIfError(auth.ValidateConfig(&conf.Spotify))
+	exitIfError(auth.ValidateConfig(ctx, &conf.Spotify))
 
 	repo := repository.Repository{
 		Sync: xsync.NewService(

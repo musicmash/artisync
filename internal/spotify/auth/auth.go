@@ -8,14 +8,14 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-func ValidateConfig(spotify *config.Spotify) error {
+func ValidateConfig(ctx context.Context, spotify *config.Spotify) error {
 	conf := &clientcredentials.Config{
 		ClientID:     spotify.ClientID,
 		ClientSecret: spotify.ClientSecret,
 		TokenURL:     spotify.TokenURL,
 	}
 
-	_, err := conf.Token(context.Background())
+	_, err := conf.Token(ctx)
 	if err != nil {
 		return fmt.Errorf("couldn't get token: %w", err)
 	}

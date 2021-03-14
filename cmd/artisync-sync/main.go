@@ -84,7 +84,7 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	exitIfError(auth.ValidateConfig(&conf.Spotify))
+	exitIfError(auth.ValidateConfig(ctx, &conf.Spotify))
 
 	// GetOAuthConfig method returns oAuth credentials, that contains empty redirect_url!
 	// It's okay, cause it is not required to issue a new token.
