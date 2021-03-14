@@ -63,7 +63,7 @@ func (s Service) GetLatestSyncInfo(ctx context.Context, userName string) (*sync.
 	info := sync.LatestInfo{}
 	task, err := s.conn.GetLatestOneTimeSyncTask(ctx, userName)
 	if err == nil {
-		info.Latest = task.UpdatedAt.Format("2006-01-02T15:04:05")
+		info.Latest = task.UpdatedAt.Format("2006-01-02 15:04:05")
 		return &info, nil
 	}
 	if errors.Is(err, sql.ErrNoRows) {
