@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -41,19 +42,23 @@ type DBConfig struct {
 }
 
 type Spotify struct {
-	AuthURL      string   `yaml:"auth_url"`
-	TokenURL     string   `yaml:"token_url"`
-	ClientID     string   `yaml:"client_id"`
-	ClientSecret string   `yaml:"client_secret"`
-	RedirectURL  string   `yaml:"redirect_url"`
-	Scopes       []string `yaml:"scopes"`
+	AuthURL        string   `yaml:"auth_url"`
+	TokenURL       string   `yaml:"token_url"`
+	ClientID       string   `yaml:"client_id"`
+	ClientSecret   string   `yaml:"client_secret"`
+	RedirectDomain string   `yaml:"redirect_domain"`
+	Scopes         []string `yaml:"scopes"`
 }
 
+// Returns oAuth credentials
+//
+// Note: RedirectURL will be empty.
+// If you need to get credentials with filled RedirectURL
+// just call GetOnceSyncOAuthConfig or GetDailySyncOAuthConfig methods.
 func (s *Spotify) GetOAuthConfig() *oauth2.Config {
 	conf := oauth2.Config{
 		ClientID:     s.ClientID,
 		ClientSecret: s.ClientSecret,
-		RedirectURL:  s.RedirectURL,
 		Scopes:       s.Scopes,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  s.AuthURL,
@@ -62,4 +67,20 @@ func (s *Spotify) GetOAuthConfig() *oauth2.Config {
 	}
 
 	return &conf
+}
+
+func (s *Spotify) GetOnceSyncOAuthConfig() *oauth2.Config {
+	conf := s.GetOAuthConfig()
+
+	conf.RedirectURL = fmt.Sprintf("%s/v1/artists/sync/once/connect", s.RedirectDomain)
+
+	return conf
+}
+
+func (s *Spotify) GetDailySyncOAuthConfig() *oauth2.Config {
+	conf := s.GetOAuthConfig()
+
+	conf.RedirectURL = fmt.Sprintf("%s/v1/artists/sync/daily/connect", s.RedirectDomain)
+
+	return conf
 }

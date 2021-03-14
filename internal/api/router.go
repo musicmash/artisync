@@ -3,16 +3,14 @@ package api
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/musicmash/artisync/internal/api/controllers/daily"
 	"github.com/musicmash/artisync/internal/api/controllers/healthz"
-	"github.com/musicmash/artisync/internal/api/controllers/spotify"
+	"github.com/musicmash/artisync/internal/api/controllers/sync"
 	"github.com/musicmash/artisync/internal/api/controllers/tasks"
 	"github.com/musicmash/artisync/internal/db"
-	dailyservice "github.com/musicmash/artisync/internal/services/daily"
-	"github.com/musicmash/artisync/internal/services/syntask"
+	"github.com/musicmash/artisync/internal/repository"
 )
 
-func GetRouter(conn *db.Conn, mgr *syntask.Mgr, dailyMgr *dailyservice.Mgr) chi.Router {
+func GetRouter(conn *db.Conn, repo *repository.Repository) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -28,9 +26,8 @@ func GetRouter(conn *db.Conn, mgr *syntask.Mgr, dailyMgr *dailyservice.Mgr) chi.
 		// to avoid logging of healthz requests
 		r.Use(middleware.Logger)
 
-		r.Mount("/artists/sync/daily", daily.New(dailyMgr).GetRouter())
-		r.Mount("/artists/sync/connect", spotify.New(mgr).GetRouter())
-		r.Mount("/artists/sync/tasks", tasks.New(mgr).GetRouter())
+		r.Mount("/artists/sync", sync.New(repo.Sync).GetRouter())
+		r.Mount("/artists/sync/tasks", tasks.New(repo.Tasks).GetRouter())
 	})
 
 	return r

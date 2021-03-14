@@ -54,11 +54,11 @@ func TestConfig_Load(t *testing.T) {
 			Level: "INFO",
 		},
 		Spotify: Spotify{
-			AuthURL:      "https://accounts.spotify.com/authorize",
-			TokenURL:     "https://accounts.spotify.com/api/token",
-			ClientID:     "2c7a0f0a-29fe-4ec4-926f-1e956297af9e",
-			ClientSecret: "75f505b3-9e40-4d55-a693-1f2388d944dd",
-			RedirectURL:  "https://musicmash.me/v1/callbacks/spotify/artists-sync/connect",
+			AuthURL:        "https://accounts.spotify.com/authorize",
+			TokenURL:       "https://accounts.spotify.com/api/token",
+			ClientID:       "2c7a0f0a-29fe-4ec4-926f-1e956297af9e",
+			ClientSecret:   "75f505b3-9e40-4d55-a693-1f2388d944dd",
+			RedirectDomain: "https://musicmash.me",
 			Scopes: []string{
 				"user-top-read",
 				"user-follow-read",

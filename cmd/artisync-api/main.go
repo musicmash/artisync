@@ -14,10 +14,10 @@ import (
 	"github.com/musicmash/artisync/internal/config"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
-	pipeline "github.com/musicmash/artisync/internal/pipelines/syntask"
-	"github.com/musicmash/artisync/internal/services/daily"
-	"github.com/musicmash/artisync/internal/services/spotify/auth"
-	task "github.com/musicmash/artisync/internal/services/syntask"
+	"github.com/musicmash/artisync/internal/repository"
+	"github.com/musicmash/artisync/internal/services/tasks"
+	"github.com/musicmash/artisync/internal/services/xsync"
+	"github.com/musicmash/artisync/internal/spotify/auth"
 	"github.com/musicmash/artisync/internal/version"
 )
 
@@ -76,11 +76,17 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
 	defer cancel()
 
-	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
-	syncPipeline := pipeline.New(conf.Spotify.GetOAuthConfig(), mgr)
-	syncTask := task.New(mgr, syncPipeline)
-	dailyMgr := daily.New(mgr)
-	router := api.GetRouter(mgr, syncTask, dailyMgr)
+	exitIfError(auth.ValidateConfig(ctx, &conf.Spotify))
+
+	repo := repository.Repository{
+		Sync: xsync.NewService(
+			mgr,
+			conf.Spotify.GetOnceSyncOAuthConfig(),
+			conf.Spotify.GetDailySyncOAuthConfig(),
+		),
+		Tasks: tasks.New(mgr),
+	}
+	router := api.GetRouter(mgr, &repo)
 	server := api.New(router, conf.HTTP)
 
 	go gracefulShutdown(ctx, server, quit, done)
