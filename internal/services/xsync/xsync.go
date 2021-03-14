@@ -7,23 +7,56 @@ import (
 
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/guard"
+	"github.com/musicmash/artisync/internal/pipelines/syntask"
 	"github.com/musicmash/artisync/internal/repository/sync"
+	"golang.org/x/oauth2"
 )
 
 type Service struct {
 	conn *db.Conn
+
+	onceSync  syntask.Pipeline
+	dailySync syntask.Pipeline
 }
 
-func NewService(conn *db.Conn) *Service {
-	return &Service{conn: conn}
+func NewService(conn *db.Conn, onceOAuthCredentials, dailyOAuthCredentials *oauth2.Config) *Service {
+	service := Service{
+		conn:      conn,
+		onceSync:  syntask.New(onceOAuthCredentials, conn),
+		dailySync: syntask.New(dailyOAuthCredentials, conn),
+	}
+
+	return &service
 }
 
-func (s Service) DoOnceSync(ctx context.Context) error {
-	panic("implement me")
+func convertPipelineResultToRepoTask(task *syntask.Task) *sync.Task {
+	return &sync.Task{ID: task.ID}
 }
 
-func (s Service) ConnectDailySync(ctx context.Context) error {
-	panic("implement me")
+func (s Service) DoOnceSync(ctx context.Context, userName, code string) (*sync.Task, error) {
+	task, err := s.onceSync.Run(ctx, &syntask.PipelineOpts{
+		UserName:          userName,
+		SpotifyAuthCode:   code,
+		ScheduleDailySync: false,
+	})
+	if err != nil {
+		return nil, guard.NewInternalError(err)
+	}
+
+	return convertPipelineResultToRepoTask(task), nil
+}
+
+func (s Service) ConnectDailySync(ctx context.Context, userName, code string) (*sync.Task, error) {
+	task, err := s.dailySync.Run(ctx, &syntask.PipelineOpts{
+		UserName:          userName,
+		SpotifyAuthCode:   code,
+		ScheduleDailySync: true,
+	})
+	if err != nil {
+		return nil, guard.NewInternalError(err)
+	}
+
+	return convertPipelineResultToRepoTask(task), nil
 }
 
 func (s Service) GetLatestSyncInfo(ctx context.Context, userName string) (*sync.LatestInfo, error) {

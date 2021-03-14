@@ -85,6 +85,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
+
+	// GetOAuthConfig method returns oAuth credentials, that contains empty redirect_url!
+	// It's okay, cause it is not required to issue a new token.
 	pipe := pipeline.New(mainDB, mashDB, *conf.Spotify.GetOAuthConfig())
 	task := sync.New(mainDB, pipe, sync.WorkerConfig{
 		// TODO (m.kalinin): extract values into config

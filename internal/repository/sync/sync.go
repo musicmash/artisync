@@ -1,6 +1,10 @@
 package sync
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type LatestInfo struct {
 	Latest string `json:"latest"`
@@ -10,10 +14,14 @@ type DailyInfo struct {
 	Enabled bool `json:"enabled"`
 }
 
+type Task struct {
+	ID uuid.UUID `json:"id"`
+}
+
 type Repository interface {
 	// Sync methods here
-	DoOnceSync(ctx context.Context) error
-	ConnectDailySync(ctx context.Context) error
+	DoOnceSync(ctx context.Context, userName, code string) (*Task, error)
+	ConnectDailySync(ctx context.Context, userName, code string) (*Task, error)
 
 	// Daily methods here
 	GetDailySyncInfo(ctx context.Context, userName string) (*DailyInfo, error)

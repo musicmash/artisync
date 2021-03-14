@@ -37,7 +37,7 @@ spotify:
   token_url: https://accounts.spotify.com/api/token
   client_id: ${SPOTIFY_CLIENT_ID}
   client_secret: ${SPOTIFY_CLIENT_SECRET}
-  redirect_url: https://musicmash.me/v1/callbacks/spotify/artists-sync/connect
+  redirect_domain: https://musicmash.me
   scopes:
     - "user-top-read"
     - "user-follow-read"

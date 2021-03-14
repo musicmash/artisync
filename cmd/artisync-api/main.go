@@ -76,8 +76,13 @@ func main() {
 	defer cancel()
 
 	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
+
 	repo := repository.Repository{
-		Sync: xsync.NewService(mgr),
+		Sync: xsync.NewService(
+			mgr,
+			conf.Spotify.GetOnceSyncOAuthConfig(),
+			conf.Spotify.GetDailySyncOAuthConfig(),
+		),
 	}
 	router := api.GetRouter(mgr, &repo)
 	server := api.New(router, conf.HTTP)
