@@ -26,6 +26,22 @@ func (s Service) ConnectDailySync(ctx context.Context) error {
 	panic("implement me")
 }
 
+func (s Service) GetLatestSyncInfo(ctx context.Context, userName string) (*sync.LatestInfo, error) {
+	info := sync.LatestInfo{}
+	task, err := s.conn.GetLatestOneTimeSyncTask(ctx, userName)
+	if err == nil {
+		info.Latest = task.UpdatedAt.Format("2006-01-02T15:04:05")
+		return &info, nil
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		// no rows means that sync os disabled
+		// return info with enabled: false (default bool value)
+		return &info, nil
+	}
+
+	return nil, guard.NewInternalError(err)
+}
+
 func (s Service) GetDailySyncInfo(ctx context.Context, userName string) (*sync.DailyInfo, error) {
 	info := sync.DailyInfo{}
 	_, err := s.conn.GetUserDailySyncTask(ctx, userName)

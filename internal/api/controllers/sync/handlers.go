@@ -19,6 +19,18 @@ func (c *Controller) DoOnceSync(w http.ResponseWriter, r *http.Request) {}
 
 func (c *Controller) ConnectDailySync(w http.ResponseWriter, r *http.Request) {}
 
+func (c *Controller) GetLatestSyncInfo(w http.ResponseWriter, r *http.Request) {
+	userName := httputils.GetUserName(r)
+
+	info, err := c.repo.GetLatestSyncInfo(r.Context(), userName)
+	if err != nil {
+		httputils.WriteGuardError(w, err)
+		return
+	}
+
+	_ = httputils.WriteJSON(w, http.StatusOK, &info)
+}
+
 func (c *Controller) GetDailySyncInfo(w http.ResponseWriter, r *http.Request) {
 	userName := httputils.GetUserName(r)
 

@@ -2,6 +2,10 @@ package sync
 
 import "context"
 
+type LatestInfo struct {
+	Latest string `json:"latest"`
+}
+
 type DailyInfo struct {
 	Enabled bool `json:"enabled"`
 }
@@ -14,4 +18,7 @@ type Repository interface {
 	// Daily methods here
 	GetDailySyncInfo(ctx context.Context, userName string) (*DailyInfo, error)
 	DisableDailySync(ctx context.Context, userName string) error
+
+	// Other methods here
+	GetLatestSyncInfo(ctx context.Context, userName string) (*LatestInfo, error)
 }
