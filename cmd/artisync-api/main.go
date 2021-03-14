@@ -16,6 +16,7 @@ import (
 	"github.com/musicmash/artisync/internal/log"
 	"github.com/musicmash/artisync/internal/repository"
 	"github.com/musicmash/artisync/internal/services/spotify/auth"
+	"github.com/musicmash/artisync/internal/services/tasks"
 	"github.com/musicmash/artisync/internal/services/xsync"
 	"github.com/musicmash/artisync/internal/version"
 )
@@ -83,6 +84,7 @@ func main() {
 			conf.Spotify.GetOnceSyncOAuthConfig(),
 			conf.Spotify.GetDailySyncOAuthConfig(),
 		),
+		Tasks: tasks.New(mgr),
 	}
 	router := api.GetRouter(mgr, &repo)
 	server := api.New(router, conf.HTTP)

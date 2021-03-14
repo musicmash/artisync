@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/musicmash/artisync/internal/api/controllers/healthz"
 	"github.com/musicmash/artisync/internal/api/controllers/sync"
+	"github.com/musicmash/artisync/internal/api/controllers/tasks"
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/repository"
 )
@@ -26,6 +27,7 @@ func GetRouter(conn *db.Conn, repo *repository.Repository) chi.Router {
 		r.Use(middleware.Logger)
 
 		r.Mount("/artists/sync", sync.New(repo.Sync).GetRouter())
+		r.Mount("/artists/sync/tasks", tasks.New(repo.Tasks).GetRouter())
 	})
 
 	return r

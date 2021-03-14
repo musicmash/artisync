@@ -6,15 +6,15 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/musicmash/artisync/internal/api/httputils"
-	"github.com/musicmash/artisync/internal/services/syntask"
+	"github.com/musicmash/artisync/internal/repository/tasks"
 )
 
 type Controller struct {
-	mgr *syntask.Mgr
+	repo tasks.Repository
 }
 
-func New(mgr *syntask.Mgr) *Controller {
-	return &Controller{mgr: mgr}
+func New(repo tasks.Repository) *Controller {
+	return &Controller{repo: repo}
 }
 
 func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
@@ -24,17 +24,17 @@ func (c *Controller) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	taskID, err := uuid.Parse(rawID)
+	id, err := uuid.Parse(rawID)
 	if err != nil {
 		httputils.WriteClientError(w, ErrInvalidUUID)
 		return
 	}
 
-	state, err := c.mgr.GetSyncTaskState(r.Context(), taskID)
+	task, err := c.repo.GetTask(r.Context(), id)
 	if err != nil {
 		httputils.WriteGuardError(w, err)
 		return
 	}
 
-	_ = httputils.WriteJSON(w, http.StatusOK, state)
+	_ = httputils.WriteJSON(w, http.StatusOK, task)
 }
