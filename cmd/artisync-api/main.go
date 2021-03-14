@@ -15,9 +15,9 @@ import (
 	"github.com/musicmash/artisync/internal/db"
 	"github.com/musicmash/artisync/internal/log"
 	"github.com/musicmash/artisync/internal/repository"
-	"github.com/musicmash/artisync/internal/services/spotify/auth"
 	"github.com/musicmash/artisync/internal/services/tasks"
 	"github.com/musicmash/artisync/internal/services/xsync"
+	"github.com/musicmash/artisync/internal/spotify/auth"
 	"github.com/musicmash/artisync/internal/version"
 )
 
@@ -76,7 +76,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HTTP.WriteTimeout)
 	defer cancel()
 
-	exitIfError(auth.ValidateAuthConf(&conf.Spotify))
+	exitIfError(auth.ValidateConfig(&conf.Spotify))
 
 	repo := repository.Repository{
 		Sync: xsync.NewService(

@@ -8,7 +8,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-func ValidateAuthConf(spotify *config.Spotify) error {
+func ValidateConfig(spotify *config.Spotify) error {
 	conf := &clientcredentials.Config{
 		ClientID:     spotify.ClientID,
 		ClientSecret: spotify.ClientSecret,
